@@ -18,7 +18,7 @@
 // A delegate is required
 - (void)setDelegate:(id)delegate;
 
-// Sets userInfo that can be grabbed later. May 
+// Sets userInfo that can be grabbed later. May
 // be nil. Especially useful for delegates
 // who store a S3ConnectionInfo in certain
 // collections since it effects (contributes to) equality.
@@ -43,7 +43,7 @@
 // specified. Note, the only likely
 // case for using this is using an
 // Amazon S3 clone API.
-// This is not to be used to make 
+// This is not to be used to make
 // virtually hosted buckets.
 - (void)setHostEndpoint:(NSString *)host;
 

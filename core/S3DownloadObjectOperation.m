@@ -26,15 +26,15 @@ static NSString *S3OperationInfoDownloadObjectOperationFilePathKey = @"S3Operati
     if (filePath) {
         [theOperationInfo setObject:filePath forKey:S3OperationInfoDownloadObjectOperationFilePathKey];
     }
-    
+
     self = [super initWithConnectionInfo:c operationInfo:theOperationInfo];
-    
+
     [theOperationInfo release];
-    
+
     if (self != nil) {
-        
+
     }
-    
+
 	return self;
 }
 
@@ -68,14 +68,14 @@ static NSString *S3OperationInfoDownloadObjectOperationFilePathKey = @"S3Operati
 - (NSString *)bucketName
 {
     S3Object *object = [self object];
-    
+
     return [[object bucket] name];
 }
 
 - (NSString *)key
 {
     S3Object *object = [self object];
-    
+
     return [object key];
 }
 
@@ -87,13 +87,13 @@ static NSString *S3OperationInfoDownloadObjectOperationFilePathKey = @"S3Operati
 - (long long)responseBodyContentExepctedLength
 {
     S3Object *object = [self object];
-    
+
     NSString *lengthString = [[object metadata] objectForKey:S3ObjectMetadataContentLengthKey];
     long long lengthNumber = 0;
     if (lengthString != nil) {
         lengthNumber = [lengthString longLongValue];
     }
-    
+
     return lengthNumber;
 }
 

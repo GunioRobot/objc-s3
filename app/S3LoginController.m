@@ -87,13 +87,13 @@
         if ([_keychainCheckbox state] == NSOnState) {
             [self setS3SecretKeyToKeychainForS3AccessKey:accessKeyID password:secretAccessKeyID];
         }
-        
+
         S3BucketListController *c = [[[S3BucketListController alloc] initWithWindowNibName:@"Buckets"] autorelease];
-        
+
         [c setConnectionInfo:[self connectionInfo]];
-        
+
         [c showWindow:self];
-        [c retain];			
+        [c retain];
         [c setBuckets:[(S3ListBucketOperation *)operation bucketList]];
         [c setBucketsOwner:[(S3ListBucketOperation*)operation owner]];
 
@@ -111,11 +111,11 @@
     }
     [accessKeyID release];
     accessKeyID = [[[NSUserDefaults standardUserDefaults] stringForKey:DEFAULT_USER] retain];
-    
-    NSDictionary *authDict = [NSDictionary dictionaryWithObjectsAndKeys:accessKeyID, @"accessKey", secretAccessKeyID, @"secretAccessKey", nil]; 
-    
+
+    NSDictionary *authDict = [NSDictionary dictionaryWithObjectsAndKeys:accessKeyID, @"accessKey", secretAccessKeyID, @"secretAccessKey", nil];
+
     [[NSApp delegate] setAuthenticationCredentials:authDict forConnectionInfo:[self connectionInfo]];
-    
+
 	S3ListBucketOperation *op = [[S3ListBucketOperation alloc] initWithConnectionInfo:[self connectionInfo]];
 
     [self addToCurrentOperations:op];
@@ -134,13 +134,13 @@
     if ([accesskey length] == 0) {
         return nil;
     }
-    
+
     void *secretData = nil; // will be allocated and filled in by SecKeychainFindGenericPassword
     UInt32 secretLength = 0;
-    
+
     NSString *secret = @"";
-    const char *key = [accesskey UTF8String]; 
-    
+    const char *key = [accesskey UTF8String];
+
     OSStatus status;
     status = SecKeychainFindGenericPassword (NULL, // default keychain
                                              strlen(S3_BROWSER_KEYCHAIN_SERVICE), S3_BROWSER_KEYCHAIN_SERVICE,
@@ -148,20 +148,20 @@
                                              &secretLength, &secretData,
                                              nil);
     if (status==noErr) {
-        secret = [[[NSString alloc] initWithBytes:secretData length:secretLength encoding:NSUTF8StringEncoding] autorelease];        
+        secret = [[[NSString alloc] initWithBytes:secretData length:secretLength encoding:NSUTF8StringEncoding] autorelease];
     }
-    
-    SecKeychainItemFreeContent(NULL,secretData);	
-    
+
+    SecKeychainItemFreeContent(NULL,secretData);
+
     return secret;
 }
 
 
 - (BOOL)setS3SecretKeyToKeychainForS3AccessKey:(NSString *)accesskey password:(NSString *)secretkey
 {
-    const char *key = [accesskey UTF8String]; 
-    const char *secret = [secretkey UTF8String]; 
-    
+    const char *key = [accesskey UTF8String];
+    const char *secret = [secretkey UTF8String];
+
     OSStatus status;
     status = SecKeychainAddGenericPassword(NULL, // default keychain
                                            strlen(S3_BROWSER_KEYCHAIN_SERVICE),S3_BROWSER_KEYCHAIN_SERVICE,

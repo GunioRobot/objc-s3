@@ -32,13 +32,13 @@ NSString *S3OperationObjectForRetryKey = @"S3OperationObjectForRetryKey";
 - (id)initWithDelegate:(id)delegate
 {
     self = [super init];
-    
+
     if (self != nil) {
         _delegate = delegate;
         _currentOperations = [[NSMutableArray alloc] init];
-        _activeOperations = [[NSMutableArray alloc] init];        
+        _activeOperations = [[NSMutableArray alloc] init];
     }
-    
+
     return self;
 }
 
@@ -90,11 +90,11 @@ NSString *S3OperationObjectForRetryKey = @"S3OperationObjectForRetryKey";
         // Retain object while it's in flux must be released at end!
         [o retain];
         [self removeFromCurrentOperations:o];
-        
+
         if ([o state] == S3OperationError) {
             // TODO: Figure out if the operation needs to be retried and send a new
-            // retry operation object to be retried as S3OperationObjectForRetryKey.      
-            // It appears valid retry on error codes: OperationAborted, InternalError        
+            // retry operation object to be retried as S3OperationObjectForRetryKey.
+            // It appears valid retry on error codes: OperationAborted, InternalError
             //    if ([o state] == S3OperationError && [o allowsRetry] == YES) {
             //        NSDictionary *errorDict = [[o error] userInfo];
             //        NSString *errorCode = [errorDict objectForKey:S3_ERROR_CODE_KEY];
@@ -102,15 +102,15 @@ NSString *S3OperationObjectForRetryKey = @"S3OperationObjectForRetryKey";
             //            // TODO: Create a retry operation from failed operation and add it to the operations to be performed.
             //            //S3Operation *retryOperation = nil;
             //            //[dict setObject:retryOperation forKey:S3OperationObjectForRetryKey];
-            //            //[self addToCurrentOperations:retryOperation];            
+            //            //[self addToCurrentOperations:retryOperation];
             //        }
             //    }
         }
     }
-    
+
     NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:o, S3OperationObjectKey, nil];
     [[NSNotificationCenter defaultCenter] postNotificationName:S3OperationQueueOperationStateDidChangeNotification object:self userInfo:dict];
-    
+
     if ([o state] >= S3OperationCanceled) {
         // Object is out of flux
         [o release];
@@ -162,7 +162,7 @@ NSString *S3OperationObjectForRetryKey = @"S3OperationObjectForRetryKey";
 {
 	[_timer invalidate];
 	[_timer release];
-	_timer = NULL;	
+	_timer = NULL;
 }
 
 - (int)canAcceptPendingOperations
@@ -174,7 +174,7 @@ NSString *S3OperationObjectForRetryKey = @"S3OperationObjectForRetryKey";
             available = maxNumber;
         }
     }
-	
+
 	S3Operation *o;
 	for (o in _currentOperations)
 	{
@@ -193,16 +193,16 @@ NSString *S3OperationObjectForRetryKey = @"S3OperationObjectForRetryKey";
     if ([op state] == S3OperationActive) {
         return;
     }
-        
+
 	[self willChangeValueForKey:@"currentOperations"];
 	[_currentOperations removeObject:op];
 	[self didChangeValueForKey:@"currentOperations"];
-	
+
     NSUInteger objectIndex = [_activeOperations indexOfObject:op];
     if (objectIndex != NSNotFound) {
         [_activeOperations replaceObjectAtIndex:objectIndex withObject:[NSNull null]];
     }
-    
+
     [self rearmTimer];
 }
 
@@ -227,22 +227,22 @@ NSString *S3OperationObjectForRetryKey = @"S3OperationObjectForRetryKey";
         [self disarmTimer];
         return;
     }
-    
+
     // Pending retries get priority start status.
 	for (o in _currentOperations) {
         if (slotsAvailable == 0) {
             break;
         }
-        
+
 		if ([o state] == S3OperationPendingRetry) {
-            
+
             NSUInteger objectIndex = [_activeOperations indexOfObject:[NSNull null]];
             if (objectIndex == NSNotFound) {
                 [_activeOperations addObject:o];
             } else {
-                [_activeOperations replaceObjectAtIndex:objectIndex withObject:o];                
+                [_activeOperations replaceObjectAtIndex:objectIndex withObject:o];
             }
-            
+
 			[o start:self];
             slotsAvailable--;
 		}
@@ -251,14 +251,14 @@ NSString *S3OperationObjectForRetryKey = @"S3OperationObjectForRetryKey";
         if (slotsAvailable == 0) {
             break;
         }
-        
+
 		if ([o state] == S3OperationPending) {
 
             NSUInteger objectIndex = [_activeOperations indexOfObject:[NSNull null]];
             if (objectIndex == NSNotFound) {
                 [_activeOperations addObject:o];
             } else {
-                [_activeOperations replaceObjectAtIndex:objectIndex withObject:o];                
+                [_activeOperations replaceObjectAtIndex:objectIndex withObject:o];
             }
 			[o start:self];
             slotsAvailable--;

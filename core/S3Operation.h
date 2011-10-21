@@ -46,29 +46,29 @@ typedef enum _S3OperationState {
     NSObject <S3OperationDelegate> *delegate;
 
     NSDictionary *operationInfo;
-    
+
     S3ConnectionInfo *connectionInfo;
-    
+
     NSCalendarDate *_date;
-    
+
     CFReadStreamRef httpOperationReadStream;
-    
+
     NSDictionary *requestHeaders;
     NSDictionary *responseHeaders;
     NSNumber *responseStatusCode;
     NSData *responseData;
     NSFileHandle *responseFileHandle;
-    
+
     S3OperationState state;
     NSString *informationalStatus;
     NSString *informationalSubStatus;
-    
+
     BOOL allowsRetry;
-    
+
     S3TransferRateCalculator *rateCalculator;
-    
+
     NSInteger queuePosition;
-    
+
     NSError *error;
 }
 
@@ -132,7 +132,7 @@ typedef enum _S3OperationState {
 - (NSString *)requestBodyContentType;
 - (NSUInteger)requestBodyContentLength;
 
-// -requestBodyContentData and -requestBodyContentFilePath provide 
+// -requestBodyContentData and -requestBodyContentFilePath provide
 // the request body data for the operation if needed. If used, only
 // one method should return non-nil. The Superclass will only use the
 // first non-nil return it sees.

@@ -48,7 +48,7 @@ typedef enum _S3RateType {
 
 @interface S3TransferRateCalculator : NSObject {
     id _delegate;
-    
+
     S3UnitType _externalUnit;
     S3RateType _externalRate;
 
@@ -62,10 +62,10 @@ typedef enum _S3RateType {
 
     NSTimer *_calculateTimer;
     NSTimeInterval _calculationRate;
-    
+
     NSString *_calculatedTransferRate;
     NSString *_timeRemaining;
-    
+
     BOOL _displayAverageRate;
 }
 

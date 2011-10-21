@@ -21,26 +21,26 @@ static NSString *S3LocationFormatString = @"<CreateBucketConfiguration><Location
 @dynamic region;
 
 - (id)initWithConnectionInfo:(S3ConnectionInfo *)ci bucket:(S3Bucket *)b region:(AWSRegion *)r;
-{    
+{
     NSMutableDictionary *theOperationInfo = [[NSMutableDictionary alloc] init];
     if (b) {
-        [theOperationInfo setObject:b forKey:S3OperationInfoAddBucketOperationBucketKey];        
+        [theOperationInfo setObject:b forKey:S3OperationInfoAddBucketOperationBucketKey];
     }
     if (r) {
         [theOperationInfo setObject:r forKey:S3OperationInfoAddBucketOperationRegionKey];
     }
 
     self = [super initWithConnectionInfo:ci operationInfo:theOperationInfo];
-    
+
     [theOperationInfo release];
 
     if (self != nil) {
         if (!([r availableServices] & AWSSimpleStorageService)) {
             [self release];
             return nil;
-        }        
+        }
     }
-    
+
 	return self;
 }
 
@@ -86,7 +86,7 @@ static NSString *S3LocationFormatString = @"<CreateBucketConfiguration><Location
     AWSRegion *region = [self region];
     if (region != nil) {
         return [[NSString stringWithFormat:S3LocationFormatString, [region regionValue]] dataUsingEncoding:NSASCIIStringEncoding];
-    }    
+    }
     return nil;
 }
 

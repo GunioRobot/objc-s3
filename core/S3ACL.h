@@ -11,7 +11,7 @@
 typedef enum _S3Permission
 {
 	S3READ_Permission
-	
+
 } S3Permission;
 
 
@@ -60,9 +60,9 @@ typedef enum _S3Permission
 @end
 
 /*
- 
+
  getACLTemplatePublicReadWrite
- 
+
  <?xml version="1.0" encoding="UTF-8"?>
  <AccessControlPolicy xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
  <Owner>
@@ -90,9 +90,9 @@ typedef enum _S3Permission
  </Grant>
  </AccessControlList>
  </AccessControlPolicy>
- 
+
  getACLTemplatePrivate
- 
+
  <?xml version="1.0" encoding="UTF-8"?>
  <AccessControlPolicy xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
  <Owner>
@@ -107,10 +107,10 @@ typedef enum _S3Permission
  </Grant>
  </AccessControlList>
  </AccessControlPolicy>
- 
- 
+
+
  getACLTemplatePublicRead
- 
+
  <?xml version="1.0" encoding="UTF-8"?>
  <AccessControlPolicy xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
  <Owner>

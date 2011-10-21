@@ -27,7 +27,7 @@
         if (name == nil) {
             [self release];
             return nil;
-        }        
+        }
         [self setName:name];
         [self setCreationDate:date];
 		[self setVirtuallyHostedCapable:[S3Bucket isDNSComptatibleName:name]];
@@ -60,13 +60,13 @@
 	// Buckets with names containing uppercase characters are not accessible using the virtual hosted-style request
  	// When using virtual hosted-style buckets with SSL, the SSL wild card certificate only matches buckets that do not contain periods.
 	// To work around this, use HTTP or write your own certificate verification logic.
-	// EU (Ireland) and US-West (Northern California) Region bucket names must be DNS compatible and therefore do not support the path style method. 
-	// US Standard bucket names do not have to be DNS compatible and therefore can support the path style method. 
+	// EU (Ireland) and US-West (Northern California) Region bucket names must be DNS compatible and therefore do not support the path style method.
+	// US Standard bucket names do not have to be DNS compatible and therefore can support the path style method.
 	// US Standard buckets can be named, http://s3.amazonaws.com/[bucket-name]/[key], for example, http://s3.amazonaws.com/images.johnsmith.net/mydog.jpg.
-	// As long as your GET request does not use the SSL endpoint, you can specify the bucket for the request using the HTTP Host header. 
-	
+	// As long as your GET request does not use the SSL endpoint, you can specify the bucket for the request using the HTTP Host header.
+
 	// Bottom-line: non-DNS bucket names are slowly going away
-	
+
 	return [[name lowercaseString] isEqualToString:name];
 }
 
@@ -82,7 +82,7 @@
 
 - (NSDate *)creationDate
 {
-    return _creationDate; 
+    return _creationDate;
 }
 
 - (void)setCreationDate:(NSDate *)aCreationDate
@@ -93,7 +93,7 @@
 
 - (NSString *)name
 {
-    return _name; 
+    return _name;
 }
 
 - (void)setName:(NSString *)aName
@@ -113,7 +113,7 @@
         if ([[self name] isEqualToString:[obj name]]) {
             return YES;
         }
-    }    
+    }
     return NO;
 }
 

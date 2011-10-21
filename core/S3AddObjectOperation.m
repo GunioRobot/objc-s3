@@ -23,15 +23,15 @@ static NSString *S3OperationInfoAddObjectOperationObjectKey = @"S3OperationInfoA
     if (o) {
         [theOperationInfo setObject:o forKey:S3OperationInfoAddObjectOperationObjectKey];
     }
-    
+
     self = [super initWithConnectionInfo:c operationInfo:theOperationInfo];
-    
+
     [theOperationInfo release];
-    
+
     if (self != nil) {
-        
+
     }
-    
+
 	return self;
 }
 
@@ -54,7 +54,7 @@ static NSString *S3OperationInfoAddObjectOperationObjectKey = @"S3OperationInfoA
 - (NSDictionary *)additionalHTTPRequestHeaders
 {
     S3Object *object = [self object];
-        
+
     return [object metadata];
 }
 
@@ -66,14 +66,14 @@ static NSString *S3OperationInfoAddObjectOperationObjectKey = @"S3OperationInfoA
 - (NSString *)bucketName
 {
     S3Object *object = [self object];
-    
+
     return [[object bucket] name];
 }
 
 - (NSString *)key
 {
     S3Object *object = [self object];
-    
+
     return [object key];
 }
 
@@ -85,42 +85,42 @@ static NSString *S3OperationInfoAddObjectOperationObjectKey = @"S3OperationInfoA
 - (NSString *)requestBodyContentMD5
 {
     S3Object *object = [self object];
-    
+
     return [[object metadata] objectForKey:S3ObjectMetadataContentMD5Key];
 }
 
 - (NSData *)requestBodyContentData
 {
     S3Object *object = [self object];
-    
+
     return [[object dataSourceInfo] objectForKey:S3ObjectNSDataSourceKey];
 }
 
 - (NSString *)requestBodyContentFilePath
 {
     S3Object *object = [self object];
-    
+
     return [[object dataSourceInfo] objectForKey:S3ObjectFilePathDataSourceKey];
 }
 
 - (NSString *)requestBodyContentType
 {
     S3Object *object = [self object];
-    
+
     return [[object metadata] objectForKey:S3ObjectMetadataContentTypeKey];
 }
 
 - (NSUInteger)requestBodyContentLength
 {
     S3Object *object = [self object];
-    
+
     NSNumber *length = [[object metadata] objectForKey:S3ObjectMetadataContentLengthKey];
     if (length != nil) {
         return [length unsignedIntegerValue];
     }
 
     if ([self requestBodyContentData] != nil) {
-        return [[self requestBodyContentData] length]; 
+        return [[self requestBodyContentData] length];
     } else if ([self requestBodyContentFilePath] != nil) {
         return [[[self requestBodyContentFilePath] fileSizeForPath] longLongValue];
     }

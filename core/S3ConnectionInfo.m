@@ -46,7 +46,7 @@ NSString *S3HeaderPrefixString = @"x-amz";
         if (delegate == nil) {
             [self release];
             return nil;
-        }        
+        }
         [self setDelegate:delegate];
         [self setUserInfo:userInfo];
         [self setSecureConnection:secureConnection];
@@ -79,7 +79,7 @@ NSString *S3HeaderPrefixString = @"x-amz";
 
 - (id)initWithDelegate:(id)delegate
 {
-    return [self initWithDelegate:delegate userInfo:nil];    
+    return [self initWithDelegate:delegate userInfo:nil];
 }
 
 - (id)init
@@ -91,7 +91,7 @@ NSString *S3HeaderPrefixString = @"x-amz";
 {
     [self setUserInfo:nil];
     [self setHostEndpoint:nil];
-    
+
 	[super dealloc];
 }
 
@@ -192,24 +192,24 @@ NSString *S3HeaderPrefixString = @"x-amz";
     // Date + '\n' +
     // CanonicalizedAmzHeaders +
     // CanonicalizedResourse;
-    
+
     NSMutableString *stringToSign = [NSMutableString string];
     [stringToSign appendFormat:@"%@\n", ([operation requestHTTPVerb] ? [operation requestHTTPVerb] : @"")];
-    
+
     NSString *md5 = [[operation additionalHTTPRequestHeaders] objectForKey:S3ObjectMetadataContentMD5Key];
     if (md5 == nil) {
         md5 = [operation requestBodyContentMD5];
     }
     [stringToSign appendFormat:@"%@\n", (md5 ? md5 : @"")];
-    
+
     NSString *contentType = [[operation additionalHTTPRequestHeaders] objectForKey:S3ObjectMetadataContentTypeKey];
     if (contentType == nil) {
         contentType = [operation requestBodyContentType];
     }
     [stringToSign appendFormat:@"%@\n", (contentType ? contentType : @"")];
-    
+
     [stringToSign appendFormat:@"%@\n", [[operation date] descriptionWithCalendarFormat:@"%a, %d %b %Y %H:%M:%S %z"]];
-    
+
     // Work out the Canonicalized Amz Headers
     NSEnumerator *e = [[[[operation additionalHTTPRequestHeaders] allKeys] sortedArrayUsingSelector:@selector(compare:)] objectEnumerator];
     NSString *key = nil;
@@ -218,10 +218,10 @@ NSString *S3HeaderPrefixString = @"x-amz";
 		id object = [[operation additionalHTTPRequestHeaders] objectForKey:key];
         NSString *lowerCaseKey = [key lowercaseString];
 		if ([key hasPrefix:S3HeaderPrefixString]) {
-			[stringToSign appendFormat:@"%@:%@\n", lowerCaseKey, object];            
+			[stringToSign appendFormat:@"%@:%@\n", lowerCaseKey, object];
         }
-	}    
-    
+	}
+
     // Work out the Canonicalized Resource
     NSURL *requestURL = [operation url];
     NSString *requestQuery = [requestURL query];
@@ -230,31 +230,31 @@ NSString *S3HeaderPrefixString = @"x-amz";
     if (requestQuery != nil) {
         NSString *withoutQuery = [absoluteString stringByReplacingOccurrencesOfString:requestQuery withString:@""];
         if ([requestPath hasSuffix:@"/"] == NO && [withoutQuery hasSuffix:@"/?"] == YES) {
-            requestPath = [NSString stringWithFormat:@"%@/", requestPath];            
+            requestPath = [NSString stringWithFormat:@"%@/", requestPath];
         }
     } else if ([requestPath hasSuffix:@"/"] == NO && [absoluteString hasSuffix:@"/"] == YES) {
         requestPath = [NSString stringWithFormat:@"%@/", requestPath];
     }
-    
+
     if (([operation isRequestOnService] == NO) && ([self virtuallyHosted] == YES) && [operation virtuallyHostedCapable]) {
         requestPath = [NSString stringWithFormat:@"/%@%@", [operation bucketName], requestPath];
     }
-    
+
     [stringToSign appendString:requestPath];
-    
+
     if ([[requestURL query] hasPrefix:@"acl"]) {
         [stringToSign appendString:@"?acl"];
     } else if ([[requestURL query] hasPrefix:@"torrent"]) {
-        [stringToSign appendString:@"?torrent"];        
+        [stringToSign appendString:@"?torrent"];
     } else if ([[requestURL query] hasPrefix:@"location"]) {
-        [stringToSign appendString:@"?location"];        
+        [stringToSign appendString:@"?location"];
     } else if ([[requestURL query] hasPrefix:@"logging"]) {
         [stringToSign appendString:@"?logging"];
     }
-    
+
     CFHTTPMessageRef httpRequest = NULL;
     NSString *authorization = nil;
-    
+
     // Sign or send this string off to be signed.
     // Check first to see if the delegate implements
     // - (NSString *)accessKeyForConnectionInfo:(S3ConnectionInfo *)connectionInfo;
@@ -262,22 +262,22 @@ NSString *S3HeaderPrefixString = @"x-amz";
     if ([[self delegate] respondsToSelector:@selector(accessKeyForConnectionInfo:)] && [[self delegate] respondsToSelector:@selector(secretAccessKeyForConnectionInfo:)]) {
         NSString *accessKey = [[self delegate] accessKeyForConnectionInfo:self];
         NSString *secretAccessKey = [[self delegate] secretAccessKeyForConnectionInfo:self];
-        
+
         if (accessKey == nil || secretAccessKey == nil) {
             return NULL;
         }
-        
+
         NSString *signature = [[[stringToSign dataUsingEncoding:NSUTF8StringEncoding] sha1HMacWithKey:secretAccessKey] encodeBase64];
         secretAccessKey = nil;
         authorization = [NSString stringWithFormat:@"AWS %@:%@", accessKey, signature];
-        
+
     } else if ([[self delegate] respondsToSelector:@selector(connectionInfo:authorizationHeaderForRequestHeader:)]) {
         authorization = [[self delegate] connectionInfo:self authorizationHeaderForRequestHeader:stringToSign];
     } else {
         // The required delegate methods are not present.
         return NULL;
     }
-    
+
     httpRequest = CFHTTPMessageCreateRequest(kCFAllocatorDefault, (CFStringRef)[operation requestHTTPVerb], (CFURLRef)requestURL, kCFHTTPVersion1_1);
     e = [[[operation additionalHTTPRequestHeaders] allKeys] objectEnumerator];
     key = nil;
@@ -286,31 +286,31 @@ NSString *S3HeaderPrefixString = @"x-amz";
 		id object = [[operation additionalHTTPRequestHeaders] objectForKey:key];
         CFHTTPMessageSetHeaderFieldValue(httpRequest, (CFStringRef)key, (CFStringRef)[NSString stringWithFormat:@"%@", object]);
 	}
-    
+
     if ([[operation additionalHTTPRequestHeaders] objectForKey:S3ObjectMetadataContentLengthKey] == nil) {
         NSNumber *contentLength = [NSNumber numberWithLongLong:[operation requestBodyContentLength]];
         CFHTTPMessageSetHeaderFieldValue(httpRequest, (CFStringRef)S3ObjectMetadataContentLengthKey, (CFStringRef)[contentLength stringValue]);
     }
-    
+
     if ([[operation additionalHTTPRequestHeaders] objectForKey:S3ObjectMetadataContentTypeKey] == nil) {
         if (contentType != nil) {
             CFHTTPMessageSetHeaderFieldValue(httpRequest, (CFStringRef)S3ObjectMetadataContentTypeKey, (CFStringRef)contentType);
         }
     }
-    
+
     if ([[operation additionalHTTPRequestHeaders] objectForKey:S3ObjectMetadataContentMD5Key] == nil) {
         if (md5 != nil) {
             CFHTTPMessageSetHeaderFieldValue(httpRequest, (CFStringRef)S3ObjectMetadataContentMD5Key, (CFStringRef)md5);
         }
     }
-    
+
     // Add the "Expect: 100-continue" header
     CFHTTPMessageSetHeaderFieldValue(httpRequest, (CFStringRef)@"Expect", (CFStringRef)@"100-continue");
-    
+
     CFHTTPMessageSetHeaderFieldValue(httpRequest, (CFStringRef)@"Date", (CFStringRef)[[operation date] descriptionWithCalendarFormat:@"%a, %d %b %Y %H:%M:%S %z"]);
     CFHTTPMessageSetHeaderFieldValue(httpRequest, (CFStringRef)@"Authorization", (CFStringRef)authorization);
 
-    
+
     return httpRequest;
 }
 
@@ -330,11 +330,11 @@ NSString *S3HeaderPrefixString = @"x-amz";
 
 - (id)mutableCopyWithZone:(NSZone *)zone
 {
-    S3MutableConnectionInfo *newObject = [[S3MutableConnectionInfo allocWithZone:zone] initWithDelegate:[self delegate] 
-                                                                                               userInfo:[self userInfo] 
-                                                                                       secureConnection:[self secureConnection] 
-                                                                                             portNumber:[self portNumber] 
-                                                                                        virtuallyHosted:[self virtuallyHosted] 
+    S3MutableConnectionInfo *newObject = [[S3MutableConnectionInfo allocWithZone:zone] initWithDelegate:[self delegate]
+                                                                                               userInfo:[self userInfo]
+                                                                                       secureConnection:[self secureConnection]
+                                                                                             portNumber:[self portNumber]
+                                                                                        virtuallyHosted:[self virtuallyHosted]
                                                                                            hostEndpoint:[self hostEndpoint]];
     return newObject;
 }
@@ -345,25 +345,25 @@ NSString *S3HeaderPrefixString = @"x-amz";
 - (BOOL)isEqual:(id)anObject
 {
     if (anObject && [anObject isKindOfClass:[S3ConnectionInfo class]]) {
-        if ([anObject delegate] == [self delegate] && 
-            (([anObject userInfo] == nil && [self userInfo] == nil) || 
+        if ([anObject delegate] == [self delegate] &&
+            (([anObject userInfo] == nil && [self userInfo] == nil) ||
              [[anObject userInfo] isEqual:[self userInfo]]) &&
             [anObject secureConnection] == [self secureConnection] &&
             [anObject portNumber] == [self portNumber] &&
             [anObject virtuallyHosted] == [self virtuallyHosted] &&
-            (([anObject hostEndpoint] == nil && [self hostEndpoint] == nil) || 
+            (([anObject hostEndpoint] == nil && [self hostEndpoint] == nil) ||
              [[anObject hostEndpoint] isEqual:[self hostEndpoint]])) {
             return YES;
         }
     }
-    
+
     return NO;
 }
 
 - (NSUInteger)hash
 {
     NSUInteger value = 0;
-    
+
     value += value * 37 + (NSUInteger)[self delegate];
     value += value * 37 + [[self userInfo] hash];
     value += value * 37 + ([self secureConnection] ? 1 : 2);

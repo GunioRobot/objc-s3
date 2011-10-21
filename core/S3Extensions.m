@@ -18,24 +18,24 @@
 	NSEnumerator *e = [self objectEnumerator];
 	NSString *path;
 	BOOL dir;
-	
+
 	while(path = [e nextObject])
 	{
 		if ([[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&dir])
-		{		
+		{
 			if (!dir)
 				[a addObject:path];
 			else
 			{
 				NSString *file;
 				NSDirectoryEnumerator *dirEnum = [[NSFileManager defaultManager] enumeratorAtPath:path];
-				
-				while (file = [dirEnum nextObject]) 
+
+				while (file = [dirEnum nextObject])
 				{
-					if (![[file lastPathComponent] hasPrefix:@"."]) 
+					if (![[file lastPathComponent] hasPrefix:@"."])
 					{
 						NSString* fullPath = [path stringByAppendingPathComponent:file];
-						
+
 						if ([[NSFileManager defaultManager] fileExistsAtPath:fullPath isDirectory:&dir])
 							if (!dir)
 								[a addObject:fullPath];
@@ -68,7 +68,7 @@
 {
     if ([self count]==0)
         return @"";
-    
+
     NSMutableString *s = [NSMutableString string];
     NSArray *keys = [self allKeys];
     NSString *k;
@@ -79,7 +79,7 @@
     [s appendString:[k stringByEscapingHTTPReserved]];
     [s appendString:@"="];
     [s appendString:[[self objectForKey:k] stringByEscapingHTTPReserved]];
-    
+
     for (i=1;i<[keys count];i++)
     {
         k = [keys objectAtIndex:i];
@@ -121,7 +121,7 @@
 	NSArray *a = [self elementsForName:n];
 	if ([a count]>0)
 		return [a objectAtIndex:0];
-	else 
+	else
 		return nil;
 }
 
@@ -181,7 +181,7 @@
 	const char* k = [key cStringUsingEncoding:NSUTF8StringEncoding];
 	const unsigned char *data = [self bytes];
 	int len = [self length];
-	
+
 	HMAC_CTX_init(&mdctx);
 	HMAC_Init(&mdctx,k,strlen(k),EVP_sha1());
 	HMAC_Update(&mdctx,data, len);
@@ -189,7 +189,7 @@
 	HMAC_CTX_cleanup(&mdctx);
 	return [NSData dataWithBytes:md_value length:md_len];
 }
-	
+
 - (NSString *)encodeBase64
 {
     return [self encodeBase64WithNewlines:NO];
@@ -205,12 +205,12 @@
 
 	BIO_write(mem, [self bytes], [self length]);
     BIO_flush(mem);
-		
+
 	char *base64Pointer;
     long base64Length = BIO_get_mem_data(mem, &base64Pointer);
-		
+
 	NSString *base64String = [[[NSString alloc] initWithBytes:base64Pointer length:base64Length encoding:NSASCIIStringEncoding] autorelease];
-		
+
 	BIO_free_all(mem);
     return base64String;
 }
@@ -226,18 +226,18 @@
 - (NSData *)decodeBase64WithNewlines:(BOOL)encodedWithNewlines;
 {
     BIO *mem = BIO_new_mem_buf((void *) [self UTF8String], strlen([self UTF8String]));
-    
+
     BIO *b64 = BIO_new(BIO_f_base64());
     if (!encodedWithNewlines)
         BIO_set_flags(b64, BIO_FLAGS_BASE64_NO_NL);
     mem = BIO_push(b64, mem);
-    
+
     NSMutableData *data = [NSMutableData data];
     char inbuf[512];
     int inlen;
     while ((inlen = BIO_read(mem, inbuf, sizeof(inbuf))) > 0)
         [data appendBytes:inbuf length:inlen];
-    
+
     BIO_free_all(mem);
     return data;
 }
@@ -256,7 +256,7 @@
 	NSDictionary *fileAttributes = [[NSFileManager defaultManager] fileAttributesAtPath:self traverseLink:YES];
 	if (fileAttributes==nil)
 		return @"Unknown";
-	
+
     return [[fileAttributes objectForKey:NSFileSize] readableFileSize];
 }
 
@@ -265,13 +265,13 @@
 	FSRef fsRef;
 	CFStringRef utiType;
 	OSStatus err;
-	
+
 	// Fast path for some mime types not correctly handling through UTI
 	if ([[self pathExtension] isEqualToString:@"css"])
 		return @"text/css";
 	if ([[self pathExtension] isEqualToString:@"dmg"])
 		return @"application/x-apple-diskimage";
-			
+
 	err= FSPathMakeRef((const UInt8 *)[self fileSystemRepresentation], &fsRef, NULL);
 	if(err != noErr)
 		return nil;
@@ -286,40 +286,40 @@
 {
 	NSString *path;
 	unsigned long long total = 0;
-	
+
 	for (path in files)
 	{
 		NSDictionary *fileAttributes = [[NSFileManager defaultManager] fileAttributesAtPath:path traverseLink:YES];
 		if (fileAttributes!=nil)
-			total = total + [[fileAttributes objectForKey:NSFileSize] unsignedLongLongValue];				
+			total = total + [[fileAttributes objectForKey:NSFileSize] unsignedLongLongValue];
 	}
-	
+
     return [NSString readableFileSizeFor:total];
 }
 
 + (NSString *)readableFileSizeFor:(unsigned long long) size
 {
-	if (size == 0.) 
+	if (size == 0.)
 		return @"Empty";
-	else 
-		if (size > 0. && size < 1024.) 
+	else
+		if (size > 0. && size < 1024.)
 			return [NSString stringWithFormat:@"%qu bytes", size];
-	else 
-		if (size >= 1024. && size < pow(1024., 2.)) 
+	else
+		if (size >= 1024. && size < pow(1024., 2.))
 			return [NSString stringWithFormat:@"%.1f KB", (size / 1024.)];
-	else 
+	else
 		if (size >= pow(1024., 2.) && size < pow(1024., 3.))
 			return [NSString stringWithFormat:@"%.2f MB", (size / pow(1024., 2.))];
-	else 
-		if (size >= pow(1024., 3.)) 
+	else
+		if (size >= pow(1024., 3.))
 			return [NSString stringWithFormat:@"%.3f GB", (size / pow(1024., 3.))];
-	
+
 	return @"Unknown";
 }
 
 + (NSString *)commonPathComponentInPaths:(NSArray *)paths
 {
-	NSString *prefix = [NSString commonPrefixWithStrings:paths]; 
+	NSString *prefix = [NSString commonPrefixWithStrings:paths];
 	NSRange r = [prefix rangeOfString:@"/" options:NSBackwardsSearch];
 	if (r.location!=NSNotFound)
 		return [prefix substringToIndex:(r.location+1)];
@@ -331,24 +331,24 @@
 {
 	int sLength = [strings count];
 	int i,j;
-	
+
 	if (sLength == 1)
 		return [strings objectAtIndex:0];
-	else 
+	else
 	{
 		NSString* prefix = [strings objectAtIndex:0];
 		int maxLength = [prefix length];
-		
+
 		for (i = 1; i < sLength; i++)
 			if ([[strings objectAtIndex:i] length] < maxLength)
 				maxLength = [[strings objectAtIndex:i] length];
-		
+
 		for (i = 0; i < maxLength; i++) {
 			unichar c = [prefix characterAtIndex:i];
-			
+
 			for (j = 1; j < sLength; j++) {
 				NSString* compareString = [strings objectAtIndex:j];
-				
+
 				if ([compareString characterAtIndex:i] != c)
 					if (i == 0)
 						return @"";
@@ -356,7 +356,7 @@
 						return [prefix substringToIndex:i];
 			}
 		}
-		
+
 		return [prefix substringToIndex:maxLength];
 	}
 }

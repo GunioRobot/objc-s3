@@ -26,15 +26,15 @@ static NSString *S3OperationInfoListObjectOperationMarkerKey = @"S3OperationInfo
     if (theMarker) {
         [theOperationInfo setObject:theMarker forKey:S3OperationInfoListObjectOperationMarkerKey];
     }
-    
+
     self = [super initWithConnectionInfo:theConnectionInfo operationInfo:theOperationInfo];
-    
+
     [theOperationInfo release];
-    
+
     if (self != nil) {
-        
+
     }
-    
+
 	return self;
 }
 
@@ -90,14 +90,14 @@ static NSString *S3OperationInfoListObjectOperationMarkerKey = @"S3OperationInfo
     NSError *_error;
 	NSXMLDocument *d = [[[NSXMLDocument alloc] initWithData:[self responseData] options:NSXMLNodeOptionsNone error:&_error] autorelease];
 	NSXMLElement *root = [d rootElement];
-	
+
 	[dictionary safeSetObject:[[root elementForName:@"Name"] stringValue] forKey:@"Name"];
 	[dictionary safeSetObject:[[root elementForName:@"Marker"] stringValue] forKey:@"Marker"];
 	[dictionary safeSetObject:[[root elementForName:@"NextMarker"] stringValue] forKey:@"NextMarker"];
 	[dictionary safeSetObject:[[root elementForName:@"MaxKeys"] stringValue] forKey:@"MaxKeys"];
 	[dictionary safeSetObject:[[root elementForName:@"Prefix"] stringValue] forKey:@"Prefix"];
 	[dictionary safeSetObject:[[root elementForName:@"IsTruncated"] stringValue] forKey:@"IsTruncated"];
-	
+
 	return dictionary;
 }
 
@@ -107,66 +107,66 @@ static NSString *S3OperationInfoListObjectOperationMarkerKey = @"S3OperationInfo
 	NSXMLDocument *d = [[[NSXMLDocument alloc] initWithData:[self responseData] options:NSXMLNodeOptionsNone error:&_error] autorelease];
 	NSXMLElement *root = [d rootElement];
 	NSXMLElement *n;
-    
+
 	NSEnumerator *e = [[root nodesForXPath:@"//Contents" error:&_error] objectEnumerator];
     NSMutableArray *result = [NSMutableArray array];
-    while (n = [e nextObject]) {        
+    while (n = [e nextObject]) {
         NSMutableDictionary *metadata = [NSMutableDictionary dictionary];
-        
+
         NSString *resultEtag = [[n elementForName:@"ETag"] stringValue];
         if (resultEtag != nil) {
             [metadata setObject:resultEtag forKey:S3ObjectMetadataETagKey];
         }
-        
+
         NSCalendarDate *resultLastModified = [[n elementForName:@"LastModified"] dateValue];
         if (resultLastModified != nil) {
             [metadata setObject:resultLastModified forKey:S3ObjectMetadataLastModifiedKey];
         }
-        
+
         NSNumber *resultSize = [[n elementForName:@"Size"] longLongNumber];
         if (resultSize != nil) {
             [metadata setObject:resultSize forKey:S3ObjectMetadataContentLengthKey];
         }
-        
+
         NSXMLElement *ownerElement = [n elementForName:@"Owner"];
         NSArray *itemsArray = [ownerElement elementsForName:@"ID"];
         NSString *ownerID = nil;
         if ([itemsArray count] == 1) {
-            ownerID = [[itemsArray objectAtIndex:0] stringValue];            
+            ownerID = [[itemsArray objectAtIndex:0] stringValue];
         }
-        
+
         itemsArray = [ownerElement elementsForName:@"DisplayName"];
         NSString *name = nil;
         if ([itemsArray count] == 1) {
-            name = [[itemsArray objectAtIndex:0] stringValue];            
+            name = [[itemsArray objectAtIndex:0] stringValue];
         }
-        
+
         S3Owner *resultOwner = nil;
         if (name != nil) {
-            resultOwner = [[[S3Owner alloc] initWithID:ownerID displayName:name] autorelease];            
+            resultOwner = [[[S3Owner alloc] initWithID:ownerID displayName:name] autorelease];
         }
-        
+
         if (resultOwner != nil) {
             [metadata setObject:resultOwner forKey:S3ObjectMetadataOwnerKey];
         }
-        
+
         NSString *resultStorageClass = [[n elementForName:@"StorageClass"] stringValue];
         if (resultStorageClass != nil) {
             [metadata setObject:resultStorageClass forKey:S3ObjectMetadataStorageClassKey];
         }
-        
+
         NSString *resultKey = [[n elementForName:@"Key"] stringValue];
-        
+
         S3Bucket *bucket = [self bucket];
         S3Object *newObject = [[S3Object alloc] initWithBucket:bucket key:resultKey userDefinedMetadata:nil metadata:metadata dataSourceInfo:nil];
-        
+
         if (newObject != nil) {
             [result addObject:newObject];
         }
         [newObject release];
     }
-    
-    return result;    
+
+    return result;
 }
 
 - (S3ListObjectOperation *)operationForNextChunk
@@ -174,20 +174,20 @@ static NSString *S3OperationInfoListObjectOperationMarkerKey = @"S3OperationInfo
     NSDictionary *d = [self metadata];
     if (![[d objectForKey:@"IsTruncated"] isEqualToString:@"true"])
         return nil;
-    
+
     NSString *nm = [d objectForKey:@"NextMarker"];
     if (nm==nil)
     {
         NSArray *objs = [self objects];
         nm = [[objs objectAtIndex:([objs count]-1)] key];
     }
-    
+
     if (nm==nil)
         return nil;
-    
+
     S3Bucket *bucket = [self bucket];
     S3ListObjectOperation *op = [[[S3ListObjectOperation alloc] initWithConnectionInfo:[self connectionInfo] bucket:bucket marker:nm] autorelease];
-    
+
     return op;
 }
 

@@ -50,7 +50,7 @@ S3Object *getS3Object(NSString *);
 NSString *getFileMD5Sum(NSString *);
 void persistMD5Sum(NSString *, NSString *, NSString *, NSString *);
 
-typedef enum { 
+typedef enum {
     INVALID_CMD_MODE,
     LIST_CMD_MODE,
     CREATE_CMD_MODE,
@@ -62,7 +62,7 @@ typedef enum {
 
 int main (int argc, const char * argv[]) {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	
+
 	// Values to store operations info
 	S3CmdMode mode = INVALID_CMD_MODE;
 	NSString* accessKeyId = nil;
@@ -116,9 +116,9 @@ int main (int argc, const char * argv[]) {
 		  NSLog(@"Unmatched param: %@", [args objectAtIndex:i]);
 		}
 	}
-	
+
 	int retval; // Return code
-	
+
 	if (mode == INVALID_CMD_MODE) {
 		// If no valid primary parameter has been provided, exit with appropriate error
 		NSLog(@"No valid primary mode has been provided. - aborting operation");
@@ -134,16 +134,16 @@ int main (int argc, const char * argv[]) {
 	} else {
 		// Connect to S3
 		NSLog(@"Building connection class");
-		
+
 		S3Connection *cnx = [[S3Connection alloc] init];
 		[cnx setAccessKeyID:accessKeyId];
-		
+
 		NSLog(@"Try to get access key from Keychain");
 		[cnx trySetupSecretAccessKeyFromKeychain];
-		
+
 		S3OperationQueue *queue = [[S3OperationQueue alloc] init];
 		S3OperationConsoleLogDelegate *opDelegate = [[S3OperationConsoleLogDelegate alloc] init];
-        [opDelegate setOperationQueue:queue]; 
+        [opDelegate setOperationQueue:queue];
 
 		if (mode == LIST_CMD_MODE) {
 			if (bucket == nil) {
@@ -199,7 +199,7 @@ int main (int argc, const char * argv[]) {
 				NSLog(@"Going to delete objects.");
 
 				S3Bucket* s3Bucket = getS3Bucket(bucket);
-				
+
 				NSEnumerator *enumerator = [fileArgs objectEnumerator];
 				NSString* fileName;
 
@@ -228,7 +228,7 @@ int main (int argc, const char * argv[]) {
 				return 248;
 			} else {
 				S3Bucket* s3Bucket = getS3Bucket(bucket);
-				
+
 				NSEnumerator *enumerator = [fileArgs objectEnumerator];
 				NSString* fileName;
 				for (fileName in fileArgs) {
@@ -243,9 +243,9 @@ int main (int argc, const char * argv[]) {
 					NSString* md5sum = getFileMD5Sum(fileName);
 					if (persistMD5Store != nil)
 						persistMD5Sum(persistMD5Store, bucket, fileName, md5sum);
-					
+
 					[opDelegate storeSumForVerification:md5sum filePath:filePath];
-					
+
 					S3ObjectStreamedUploadOperation* op = [S3ObjectStreamedUploadOperation objectUploadWithConnection:cnx bucket:s3Bucket data:info acl:@"private"];
 					[op setDelegate:opDelegate];
 					[queue addToCurrentOperations:op];
@@ -262,10 +262,10 @@ int main (int argc, const char * argv[]) {
 				return 246;
 			} else {
 				S3Bucket* s3Bucket = getS3Bucket(bucket);
-				
+
 				char cwdBuffer[512];
 				NSString* currentDir = [[NSString alloc] initWithCString:getcwd(cwdBuffer, 512 * sizeof(char))];
-				
+
 				NSEnumerator *enumerator = [fileArgs objectEnumerator];
 				NSString* fileName;
 				for (fileName in fileArgs) {
@@ -280,7 +280,7 @@ int main (int argc, const char * argv[]) {
 			NSLog(@"Specified operation has not been implemented yet.");
 			return 254;
 		}
-		
+
 		// Run whatever is in the queue
         NSLog(@"Running the runloop");
         NSRunLoop *theRL = [NSRunLoop currentRunLoop];
@@ -307,7 +307,7 @@ int main (int argc, const char * argv[]) {
             timeout = [NSDate dateWithTimeIntervalSinceNow:30];
             [theRL runMode:NSDefaultRunLoopMode beforeDate:timeout];
         }
-        
+
         if ([[queue currentOperations] count] > 0) {
             NSEnumerator *enumerator = [[queue currentOperations] objectEnumerator];
             S3Operation *op;
@@ -319,8 +319,8 @@ int main (int argc, const char * argv[]) {
         } else {
             NSLog(@"Operations queue empty");
         }
-        
-		
+
+
 		// Verify if operation completed successfully
 		if ([opDelegate operationFailed]) {
 			NSLog(@"Operation failed!");
@@ -332,7 +332,7 @@ int main (int argc, const char * argv[]) {
 
 		[queue release];
 		[opDelegate release];
-		
+
 		[cnx release];
 	}
 
@@ -360,7 +360,7 @@ NSString* getFileMD5Sum(NSString* fileName) {
 
 	NSFileHandle* file = [NSFileHandle fileHandleForReadingAtPath:fileName];
 	NSData* data;
-	
+
 	EVP_MD_CTX_init(&mdctx);
 	EVP_DigestInit_ex(&mdctx, EVP_md5(), NULL);
 
@@ -368,18 +368,18 @@ NSString* getFileMD5Sum(NSString* fileName) {
 		data = [file readDataOfLength:255];
 		EVP_DigestUpdate(&mdctx, [data bytes], [data length]);
 	} while([data length] > 0);
-	
+
 	EVP_DigestFinal_ex(&mdctx, md_value, &md_len);
 	EVP_MD_CTX_cleanup(&mdctx);
-	
+
 	char md_char[255];
-	
+
 	for (int i=0; i < md_len; i++) snprintf(md_char + i*2, sizeof(md_char) - i*2, "%02x", md_value[i]);
-	
+
 	NSLog(@"%s", md_char);
-	
+
 	NSString *md_sum = [[NSString alloc] initWithCString:md_char encoding:NSUTF8StringEncoding];
-	
+
 	return md_sum;
 }
 
@@ -391,14 +391,14 @@ NSString* getFileMD5Sum(NSString* fileName) {
 
 void persistMD5Sum(NSString* persistMD5Store, NSString* bucket, NSString* fileName, NSString* md5sum) {
 	NSLog(@"Persisting MD5 sum of %@ in bucket %@ to %@", fileName, bucket, persistMD5Store);
-	
+
 	// Prepare data that should be written to file
 	char persist_char[2048]; // 256-byte bucket name, 1024-byte key name, 32-byte sum, 4 delimiters
-	int persist_len = snprintf(persist_char, sizeof(persist_char), "%s:%s:%s\n", 
+	int persist_len = snprintf(persist_char, sizeof(persist_char), "%s:%s:%s\n",
 		[bucket UTF8String], [fileName UTF8String], [md5sum UTF8String]);
-	
+
 	NSData* persist_data = [NSData dataWithBytes:persist_char length:persist_len];
-	
+
 	NSFileHandle* store = [NSFileHandle fileHandleForWritingAtPath:persistMD5Store];
 	if (store != nil) {
 		[store seekToEndOfFile];

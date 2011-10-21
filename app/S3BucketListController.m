@@ -74,13 +74,13 @@ enum {
 
 - (NSArray *)toolbarDefaultItemIdentifiers:(NSToolbar *)toolbar
 {
-    return [NSArray arrayWithObjects: @"Add", @"Remove", NSToolbarFlexibleSpaceItemIdentifier, @"Refresh", nil]; 
+    return [NSArray arrayWithObjects: @"Add", @"Remove", NSToolbarFlexibleSpaceItemIdentifier, @"Refresh", nil];
 }
 
 - (NSToolbarItem *)toolbar:(NSToolbar *)toolbar itemForItemIdentifier:(NSString *)itemIdentifier willBeInsertedIntoToolbar:(BOOL)flag
 {
     NSToolbarItem *item = [[NSToolbarItem alloc] initWithItemIdentifier: itemIdentifier];
-    
+
     if ([itemIdentifier isEqualToString: @"Add"])
     {
         [item setLabel: NSLocalizedString(@"Add", nil)];
@@ -105,7 +105,7 @@ enum {
         [item setTarget:self];
         [item setAction:@selector(refresh:)];
     }
-    
+
     return [item autorelease];
 }
 
@@ -129,15 +129,15 @@ enum {
     if (index == NSNotFound) {
         return;
     }
-    
+
     [super operationQueueOperationStateDidChange:notification];
 
     if ([operation state] == S3OperationDone) {
         if ([operation isKindOfClass:[S3ListBucketOperation class]]) {
             [self setBuckets:[(S3ListBucketOperation *)operation bucketList]];
-            [self setBucketsOwner:[(S3ListBucketOperation *)operation owner]];			
+            [self setBucketsOwner:[(S3ListBucketOperation *)operation owner]];
         } else {
-            [self refresh:self];            
+            [self refresh:self];
         }
     }
 }
@@ -150,7 +150,7 @@ enum {
     NSAlert *alert = [[NSAlert alloc] init];
     if ([[_bucketsController selectedObjects] count] == 1) {
         [alert setMessageText:NSLocalizedString(@"Remove bucket permanently?",nil)];
-        [alert setInformativeText:NSLocalizedString(@"Warning: Are you sure you want to remove the bucket? This operation cannot be undone.",nil)];        
+        [alert setInformativeText:NSLocalizedString(@"Warning: Are you sure you want to remove the bucket? This operation cannot be undone.",nil)];
     } else {
         [alert setMessageText:NSLocalizedString(@"Remove all selected buckets permanently?",nil)];
         [alert setInformativeText:NSLocalizedString(@"Warning: Are you sure you want to remove all the selected buckets? This operation cannot be undone.",nil)];
@@ -158,7 +158,7 @@ enum {
     [alert addButtonWithTitle:NSLocalizedString(@"Cancel",nil)];
     [alert addButtonWithTitle:NSLocalizedString(@"Remove",nil)];
     if ([alert runModal] == NSAlertFirstButtonReturn)
-    {   
+    {
         [alert release];
         return;
     }
@@ -166,7 +166,7 @@ enum {
 
     S3Bucket *b;
     NSEnumerator *e = [[_bucketsController selectedObjects] objectEnumerator];
-    
+
     while (b = [e nextObject]) {
         S3DeleteBucketOperation *op = [[S3DeleteBucketOperation alloc] initWithConnectionInfo:[self connectionInfo] bucket:b];
         [self addToCurrentOperations:op];
@@ -176,7 +176,7 @@ enum {
 - (IBAction)refresh:(id)sender
 {
 	S3ListBucketOperation *op = [[S3ListBucketOperation alloc] initWithConnectionInfo:[self connectionInfo]];
-    
+
     [self addToCurrentOperations:op];
 }
 
@@ -189,7 +189,7 @@ enum {
         if (newBucket == nil) {
             return;
         }
-        
+
         AWSRegion *bucketRegion = nil;
         if (_location == USWestLocation) {
             bucketRegion = [AWSRegion regionWithKey:AWSRegionUSWestKey];
@@ -198,9 +198,9 @@ enum {
         } else {
             bucketRegion = [AWSRegion regionWithKey:AWSRegionUSStandardKey];
         }
-                
+
         S3AddBucketOperation *op = [[S3AddBucketOperation alloc] initWithConnectionInfo:[self connectionInfo] bucket:newBucket region:bucketRegion];
-        
+
         [self addToCurrentOperations:op];
     }
 }
@@ -213,7 +213,7 @@ enum {
 
 - (IBAction)open:(id)sender
 {
-    
+
     S3Bucket *b;
     NSEnumerator* e = [[_bucketsController selectedObjects] objectEnumerator];
     while (b = [e nextObject])
@@ -226,8 +226,8 @@ enum {
             [c setBucket:b];
 
             [c setConnectionInfo:[self connectionInfo]];
-            
-            [c showWindow:self];            
+
+            [c showWindow:self];
             [_bucketListControllerCache setObject:c forKey:b];
         }
     }
@@ -242,7 +242,7 @@ enum {
 
 - (NSString *)name
 {
-    return _name; 
+    return _name;
 }
 
 - (void)setName:(NSString *)aName
@@ -267,7 +267,7 @@ enum {
 
 - (S3Owner *)bucketsOwner
 {
-    return _bucketsOwner; 
+    return _bucketsOwner;
 }
 
 - (void)setBucketsOwner:(S3Owner *)anBucketsOwner
@@ -278,7 +278,7 @@ enum {
 
 - (NSArray *)buckets
 {
-    return _buckets; 
+    return _buckets;
 }
 
 - (void)setBuckets:(NSArray *)aBuckets
@@ -296,11 +296,11 @@ enum {
     [[[NSApp delegate] queue] removeQueueListener:self];
 
     [_bucketListControllerCache release];
-    
+
     [self setName:nil];
     [self setBucketsOwner:nil];
     [self setBuckets:nil];
-    
+
     [super dealloc];
 }
 

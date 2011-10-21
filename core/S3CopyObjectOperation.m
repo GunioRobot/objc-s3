@@ -27,15 +27,15 @@ static NSString *S3OperationInfoCopyObjectOperationDestinationObjectKey = @"S3Op
     if (destination) {
         [theOperationInfo setObject:destination forKey:S3OperationInfoCopyObjectOperationDestinationObjectKey];
     }
-    
+
     self = [super initWithConnectionInfo:c operationInfo:theOperationInfo];
-    
+
     [theOperationInfo release];
-    
+
     if (self != nil) {
-        
+
     }
-    
+
 	return self;
 }
 
@@ -65,19 +65,19 @@ static NSString *S3OperationInfoCopyObjectOperationDestinationObjectKey = @"S3Op
 {
     S3Object *sourceObject = [self sourceObject];
     S3Object *destinationObject = [self destinationObject];
-    
+
     NSDictionary *destinationUserMetadata = [destinationObject userDefinedMetadata];
     NSMutableDictionary *additionalMetadata = [NSMutableDictionary dictionary];
-    
+
     if ([destinationUserMetadata count]) {
         [additionalMetadata setObject:@"REPLACE" forKey:@"x-amz-metadata-directive"];
         [additionalMetadata addEntriesFromDictionary:[destinationObject metadata]];
     }
-    
+
     NSString *copySource = [NSString stringWithFormat:@"/%@/%@", [[sourceObject bucket] name], [sourceObject key]];
     NSString *copySourceURLEncoded = [(NSString *)CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (CFStringRef)copySource, NULL, (CFStringRef)@"[]#%?,$+=&@:;()'*!", kCFStringEncodingUTF8) autorelease];
     [additionalMetadata setObject:copySourceURLEncoded forKey:@"x-amz-copy-source"];
-    
+
     return additionalMetadata;
 }
 
@@ -89,14 +89,14 @@ static NSString *S3OperationInfoCopyObjectOperationDestinationObjectKey = @"S3Op
 - (NSString *)bucketName
 {
     S3Object *destinationObject = [self destinationObject];
-    
+
     return [[destinationObject bucket] name];
 }
 
 - (NSString *)key
 {
     S3Object *destinationObject = [self destinationObject];
-    
+
     return [destinationObject key];
 }
 
@@ -111,7 +111,7 @@ static NSString *S3OperationInfoCopyObjectOperationDestinationObjectKey = @"S3Op
             return YES;
         }
     }
-    
+
     return NO;
 }
 @end

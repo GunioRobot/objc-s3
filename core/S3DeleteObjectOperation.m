@@ -22,19 +22,19 @@ static NSString *S3OperationInfoDeleteObjectOperationObjectKey = @"S3OperationIn
     if (o) {
         [theOperationInfo setObject:o forKey:S3OperationInfoDeleteObjectOperationObjectKey];
     }
-    
+
     self = [super initWithConnectionInfo:c operationInfo:theOperationInfo];
-    
+
     [theOperationInfo release];
-    
+
     if (self != nil) {
-        
+
     }
-    
+
 	return self;
 }
 
-- (S3Object *)object 
+- (S3Object *)object
 {
     NSDictionary *theOperationInfo = [self operationInfo];
     return [theOperationInfo objectForKey:S3OperationInfoDeleteObjectOperationObjectKey];

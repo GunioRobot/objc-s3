@@ -17,13 +17,13 @@
 - (id)init
 {
     self = [super init];
-    
+
     if (self != nil) {
         NSMutableArray *array = [[NSMutableArray alloc] init];
         [self setOperations:array];
         [array release];
     }
-    
+
     return self;
 }
 
@@ -54,9 +54,9 @@
     if ([[standardUserDefaults objectForKey:@"autoclean"] boolValue] == TRUE) {
         NSUInteger indexOfObject = [[self operations] indexOfObject:o];
         if (indexOfObject != NSNotFound) {
-            [self removeObjectFromOperationsAtIndex:indexOfObject];            
+            [self removeObjectFromOperationsAtIndex:indexOfObject];
         }
-    }    
+    }
 }
 
 @end

@@ -9,6 +9,6 @@
 #import <Cocoa/Cocoa.h>
 
 
-@interface S3ClickableURLField : NSTextField 
+@interface S3ClickableURLField : NSTextField
 
 @end

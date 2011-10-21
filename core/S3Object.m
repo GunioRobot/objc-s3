@@ -47,7 +47,7 @@ NSString *S3ObjectMetadataStorageClassKey = @"storageclass";
 - (id)initWithBucket:(S3Bucket *)bucket key:(NSString *)key userDefinedMetadata:(NSDictionary *)udmd metadata:(NSDictionary *)md dataSourceInfo:(NSDictionary *)info
 {
     self = [super init];
-    
+
     if (self != nil) {
         [self setKey:key];
         [self setBucket:bucket];
@@ -63,7 +63,7 @@ NSString *S3ObjectMetadataStorageClassKey = @"storageclass";
         [self setUserDefinedMetadata:udmd];
         [self setDataSourceInfo:info];
     }
-    
+
     return self;
 }
 
@@ -127,7 +127,7 @@ NSString *S3ObjectMetadataStorageClassKey = @"storageclass";
 {
     id o = [[self metadata] objectForKey:key];
 	if (o != nil) {
-		return o;        
+		return o;
     }
 
     return [super valueForUndefinedKey:key];

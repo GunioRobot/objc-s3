@@ -20,15 +20,15 @@ static NSString *S3OperationInfoDeleteBucketOperationBucketKey = @"S3OperationIn
     if (b) {
         [theOperationInfo setObject:b forKey:S3OperationInfoDeleteBucketOperationBucketKey];
     }
-    
+
     self = [super initWithConnectionInfo:theConnectionInfo operationInfo:theOperationInfo];
-    
+
     [theOperationInfo release];
-    
+
     if (self != nil) {
-        
+
     }
-    
+
 	return self;
 }
 

@@ -17,7 +17,7 @@
 @interface S3LoginController : S3ActiveWindowController {
 	IBOutlet NSButton *_defaultButton;
 	IBOutlet NSButton *_keychainCheckbox;
-    
+
     NSString *accessKeyID;
     NSString *secretAccessKeyID;
 }

@@ -20,6 +20,6 @@
 
 @interface NSURLRequest (Logging)
 - (NSArray *)headersSent;
-@end 
+@end
 
 

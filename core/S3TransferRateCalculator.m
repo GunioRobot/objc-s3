@@ -253,7 +253,7 @@
 	_calculateTimer = [NSTimer scheduledTimerWithTimeInterval:_calculationRate target:self selector:@selector(updateRateVariables:) userInfo:nil repeats:YES];
 	[_calculateTimer retain];
 	if (_startTime == nil) {
-		_startTime = [[NSDate alloc] init];		
+		_startTime = [[NSDate alloc] init];
 	}
 }
 
@@ -292,7 +292,7 @@
 	[_timeRemaining release];
 	_timeRemaining = nil;
 	if (_objective > 0 && _totalTransfered > 0) {
-		// 
+		//
 		NSTimeInterval estimatedSeconds = (_objective - _totalTransfered) / (_totalTransfered / [_lastUpdateTime timeIntervalSinceDate:_startTime]);
 		int days = estimatedSeconds / 86400;
 		estimatedSeconds = estimatedSeconds - (days * 86400);
@@ -307,7 +307,7 @@
 			if (days == 1) {
 				[timeRemaining appendFormat:@"day"];
 			} else {
-				[timeRemaining appendFormat:@"days"];				
+				[timeRemaining appendFormat:@"days"];
 			}
             if (hours > 0 || minutes > 0 || seconds > 0) {
                 [timeRemaining appendString:@" "];
@@ -315,30 +315,30 @@
 		}
         if (hours > 0) {
             if (hours < 10) {
-                [timeRemaining appendFormat:@"%dh:", hours];                
+                [timeRemaining appendFormat:@"%dh:", hours];
             } else {
-                [timeRemaining appendFormat:@"%.2dh:", hours];                
+                [timeRemaining appendFormat:@"%.2dh:", hours];
             }
         }
         if (hours > 0 || minutes > 0) {
             if (hours == 0 && minutes < 10) {
-                [timeRemaining appendFormat:@"%dm:", minutes];                
+                [timeRemaining appendFormat:@"%dm:", minutes];
             } else {
-                [timeRemaining appendFormat:@"%.2dm:", minutes];                
+                [timeRemaining appendFormat:@"%.2dm:", minutes];
             }
         }
         if (hours > 0 || minutes > 0 || seconds > 0) {
             if (hours == 0 && minutes == 0 && seconds < 10) {
-                [timeRemaining appendFormat:@"%ds", seconds];                
+                [timeRemaining appendFormat:@"%ds", seconds];
             } else {
-                [timeRemaining appendFormat:@"%.2ds", seconds];                
+                [timeRemaining appendFormat:@"%.2ds", seconds];
             }
         }
 		_timeRemaining = [[NSString alloc] initWithString:timeRemaining];
 	} else {
 		_timeRemaining = nil;
-	}	
-	
+	}
+
 	_totalTransfered += _pendingIncrease;
 	_pendingIncrease = 0;
 	[_lastUpdateTime autorelease];
@@ -460,7 +460,7 @@
             break;
         case S3PetabitUnit:
             return @"petabit";
-            break;            
+            break;
 		case S3KibibyteUnit:
 			return @"kibibyte";
 			break;
@@ -516,7 +516,7 @@
 			break;
 		default:
             return @"?";
-	}    
+	}
 }
 
 - (NSString *)stringForLongRateUnit

@@ -22,9 +22,9 @@
 	delegate = d;
 }
 
-- (BOOL)validateDraggingInfo:(id <NSDraggingInfo>)info 
+- (BOOL)validateDraggingInfo:(id <NSDraggingInfo>)info
 {
-    if ([[[info draggingPasteboard] types] containsObject:NSFilenamesPboardType]) 
+    if ([[[info draggingPasteboard] types] containsObject:NSFilenamesPboardType])
     {
         NSArray *files = [[info draggingPasteboard] propertyListForType:NSFilenamesPboardType];
         for (id loopItem in files)
@@ -33,7 +33,7 @@
                 return YES;
         }
     }
-    
+
 	return NO;
 }
 
@@ -41,7 +41,7 @@
 {
 	if ([self validateDraggingInfo:info])
 	{
-		[tv setDropRow:-1 dropOperation:NSTableViewDropOn];	
+		[tv setDropRow:-1 dropOperation:NSTableViewDropOn];
 		return NSDragOperationCopy;
 	}
 	else
@@ -50,7 +50,7 @@
 
 - (BOOL)tableView:(NSTableView *)tv acceptDrop:(id <NSDraggingInfo>)info row:(int)row dropOperation:(NSTableViewDropOperation)op
 {
-    if ([[[info draggingPasteboard] types] containsObject:NSFilenamesPboardType]) 
+    if ([[[info draggingPasteboard] types] containsObject:NSFilenamesPboardType])
     {
         NSArray *files = [[info draggingPasteboard] propertyListForType:NSFilenamesPboardType];
 		[delegate importFiles:files withDialog:TRUE];

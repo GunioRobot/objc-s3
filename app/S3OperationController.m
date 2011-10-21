@@ -42,16 +42,16 @@
 
 - (NSArray *)toolbarDefaultItemIdentifiers:(NSToolbar*)toolbar
 {
-	return [NSArray arrayWithObjects: @"Info", @"Remove", NSToolbarFlexibleSpaceItemIdentifier, @"Stop", nil]; 
+	return [NSArray arrayWithObjects: @"Info", @"Remove", NSToolbarFlexibleSpaceItemIdentifier, @"Stop", nil];
 }
 
 - (BOOL)validateToolbarItem:(NSToolbarItem *)theItem
 {
-	if ([[theItem itemIdentifier] isEqualToString:@"Remove"]) {	
+	if ([[theItem itemIdentifier] isEqualToString:@"Remove"]) {
 		if (![_operationsArrayController canRemove]) {
 			return NO;
         }
-		
+
 		NSEnumerator *e = [[_operationsArrayController selectedObjects] objectEnumerator];
 		S3Operation *op;
 		while (op = [e nextObject]) {
@@ -61,7 +61,7 @@
 		}
 		return YES;
 	}
-	if ([[theItem itemIdentifier] isEqualToString:@"Stop"]) {	
+	if ([[theItem itemIdentifier] isEqualToString:@"Stop"]) {
 		NSEnumerator *e = [[_operationsArrayController selectedObjects] objectEnumerator];
 		S3Operation *op;
 		while (op = [e nextObject]) {
@@ -89,12 +89,12 @@
 {
 	NSEnumerator *e = [[_operationsArrayController selectedObjects] objectEnumerator];
 	S3Operation *op;
-	while (op = [e nextObject]) 
+	while (op = [e nextObject])
 	{
 		if (([op state]==S3OperationActive)||([op state]==S3OperationPending)) {
-			[op stop:self];            
+			[op stop:self];
         }
-	}	
+	}
 }
 
 - (IBAction)info:(id)sender
@@ -105,7 +105,7 @@
 - (NSToolbarItem*)toolbar:(NSToolbar *)toolbar itemForItemIdentifier:(NSString *)itemIdentifier willBeInsertedIntoToolbar:(BOOL)flag
 {
 	NSToolbarItem *item = [[NSToolbarItem alloc] initWithItemIdentifier: itemIdentifier];
-	
+
 	if ([itemIdentifier isEqualToString: @"Stop"])
 	{
 		[item setLabel: NSLocalizedString(@"Stop", nil)];
@@ -130,7 +130,7 @@
 		[item setTarget:self];
 		[item setAction:@selector(info:)];
     }
-	
+
     return [item autorelease];
 }
 @end

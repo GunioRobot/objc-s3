@@ -43,16 +43,16 @@
     NSString *defaultAccessKey = [[NSUserDefaults standardUserDefaults] stringForKey:@"default-accesskey"];
     if (defaultAccessKey != nil) {
         [[NSUserDefaults standardUserDefaults] setObject:defaultAccessKey forKey:@"defaultAccessKey"];
-        [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"default-accesskey"];            
+        [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"default-accesskey"];
     }
-    
+
     // Conversion code for new default
     NSString *defaultUploadPrivacyKey = [[NSUserDefaults standardUserDefaults] stringForKey:@"default-upload-privacy"];
     if (defaultUploadPrivacyKey != nil) {
         [[NSUserDefaults standardUserDefaults] setObject:defaultUploadPrivacyKey forKey:@"defaultUploadPrivacy"];
-        [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"default-upload-privacy"];            
+        [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"default-upload-privacy"];
     }
-    
+
     S3FileSizeTransformer *fileSizeTransformer = [[[S3FileSizeTransformer alloc] init] autorelease];
     [NSValueTransformer setValueTransformer:fileSizeTransformer forName:@"S3FileSizeTransformer"];
 }
@@ -60,7 +60,7 @@
 - (id)init
 {
     self = [super init];
-    
+
     if (self != nil) {
         _controllers = [[NSMutableDictionary alloc] init];
         _queue = [[S3OperationQueue alloc] initWithDelegate:self];
@@ -68,7 +68,7 @@
         _authenticationCredentials = [[NSMutableDictionary alloc] init];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(finishedLaunching) name:NSApplicationDidFinishLaunchingNotification object:NSApp];
     }
-    
+
     return self;
 }
 
@@ -84,16 +84,16 @@
 }
 
 - (IBAction)openConnection:(id)sender
-{    
+{
 	S3LoginController *c = [[[S3LoginController alloc] initWithWindowNibName:@"Authentication"] autorelease];
 
     NSUserDefaults *standardUserDefaults = [NSUserDefaults standardUserDefaults];
     NSNumber *useSSL = [standardUserDefaults objectForKey:@"useSSL"];
-    
+
     S3ConnectionInfo *connectionInfo = [[S3ConnectionInfo alloc] initWithDelegate:self userInfo:nil secureConnection:[useSSL boolValue]];
     [c setConnectionInfo:connectionInfo];
-    [connectionInfo release];        
-	
+    [connectionInfo release];
+
     [c showWindow:self];
 	[c retain];
 }
@@ -108,15 +108,15 @@
 {
     NSUserDefaults *standardUserDefaults = [NSUserDefaults standardUserDefaults];
     NSNumber *useSSL = [standardUserDefaults objectForKey:@"useSSL"];
-    
+
     S3ConnectionInfo *connectionInfo = [[S3ConnectionInfo alloc] initWithDelegate:self userInfo:nil secureConnection:[useSSL boolValue]];
-    
+
     S3LoginController *c = [[[S3LoginController alloc] initWithWindowNibName:@"Authentication"] autorelease];
     [c setConnectionInfo:connectionInfo];
-	
+
     [c showWindow:self];
     [c retain];
-        
+
     [c connect:self];
 
     [connectionInfo release];
@@ -124,20 +124,20 @@
 
 - (void)finishedLaunching
 {
-   
+
 	S3OperationController *c = [[[S3OperationController alloc] initWithWindowNibName:@"Operations"] autorelease];
 	[_controllers setObject:c forKey:@"Console"];
-    
+
     NSUserDefaults *standardUserDefaults = [NSUserDefaults standardUserDefaults];
     NSNumber *consoleVisible = [standardUserDefaults objectForKey:@"consolevisible"];
-    // cover the migration cases 
+    // cover the migration cases
     if (([consoleVisible boolValue] == TRUE)||(consoleVisible==nil)) {
-        [[_controllers objectForKey:@"Console"] showWindow:self];        
+        [[_controllers objectForKey:@"Console"] showWindow:self];
     } else {
         // Load the window to be ready for the console to be shown.
         [[_controllers objectForKey:@"Console"] window];
     }
-    
+
     if ([[standardUserDefaults objectForKey:@"autologin"] boolValue] == TRUE) {
         [self tryAutoLogin];
     }
@@ -163,7 +163,7 @@
     if (authDict == nil || connInfo == nil) {
         return;
     }
-    
+
     [_authenticationCredentials setObject:authDict forKey:connInfo];
 }
 
@@ -202,7 +202,7 @@
     if (authenticationCredentials == nil) {
         return nil;
     }
-    
+
     // TODO: constant defined keys
     return [authenticationCredentials objectForKey:@"secretAccessKey"];
 }

@@ -39,7 +39,7 @@
 {
 	NSString* ETag = [self headerFieldValue:@"ETag"];
 	NSMutableString* MutableETag = [NSMutableString stringWithString:ETag];
-	
+
 	// Remove unnecessary quotes
 	NSRange range = {0, 1};
 	[MutableETag deleteCharactersInRange:range];

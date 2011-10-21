@@ -100,7 +100,7 @@
 		NSLog(@"%d bucket%s found.", [buckets count], [buckets count] == 1 ? "" : "s");
 	} else if ([o isKindOfClass:[S3ObjectListOperation class]]) {
 		NSMutableArray* objects = [(S3ObjectListOperation*)o objects];
-		
+
 		if (verifyDictionary == nil) {
 			// List objects
 			for (int i = 0; i < [objects count]; i++) {
@@ -127,16 +127,16 @@
 				[verifyDictionary removeObjectForKey:key];
 			}
 		}
-		
+
 		S3ObjectListOperation* next = [(S3ObjectListOperation*)o operationForNextChunk];
 		if (next != nil)
 			[[notification object] addToCurrentOperations:next];
-		
+
 		// If there are no more entries and we are verifying objects, then list all objects that
 		// have not been checked yet and are missing on S3, but are in the local sums file.
 		if (next == nil && verifyDictionary != nil) {
 			NSArray* missingKeys = [verifyDictionary allKeys];
-			
+
 			NSString* key;
 			for(key in missingKeys) {
 				NSLog(@"- %@", key);
@@ -182,11 +182,11 @@
 {
 	verifyDictionary = [[NSMutableDictionary alloc] init];
 	NSMutableDictionary* sumsDictionary = [[NSMutableDictionary alloc] init];
-	
+
 	NSString* store = [NSString stringWithContentsOfFile:persistMD5Store];
 	if (store != nil) {
 		NSArray* storeLines = [store componentsSeparatedByString:@"\n"];
-		
+
 		NSString *line;
 		for(line in storeLines) {
 			NSLog(@"String: %@", line);
@@ -201,57 +201,57 @@
 				for (ilast=[line length]-1; c != ':'; ilast--)
 					c = (char)[line characterAtIndex:ilast];
 				NSLog(@"last colon position: %d", ilast);
-				
+
 				// Extract the three substrings we need
 				NSRange range = { 0, ifirst-1 };
 				NSString* bucketName = [line substringWithRange:range];
 				NSLog(@"BucketName: %@", bucketName);
-				
+
 				range.location = ifirst;
 				range.length = ilast - ifirst + 1;
 				NSString* keyName = [line substringWithRange:range];
 				NSLog(@"KeyName: %@", keyName);
-				
+
 				range.location = ilast + 2;
 				range.length = [line length] - ilast - 2;
-				NSMutableString* cksum = [[NSMutableString alloc] init]; 
+				NSMutableString* cksum = [[NSMutableString alloc] init];
 				[cksum appendString:@"\""];
 				NSString* unquotedcksum = [line substringWithRange:range];
 				[cksum appendString:unquotedcksum];
 				[cksum appendString:@"\""];
 				NSLog(@"CkSum: %@", cksum);
-				
+
 				// Write the values to sumsDictionary
 				NSMutableString* sumKey = [[NSMutableString alloc] init];
 				[sumKey appendString:bucketName];
 				[sumKey appendString:@":"];
 				[sumKey appendString:keyName];
 				[sumsDictionary setValue:unquotedcksum forKey:sumKey];
-				
+
 				// Write the values to verifyDictionary if they match the currently verified bucket
 				if ([bucketName isEqualToString:bucket])
 					[verifyDictionary setValue:cksum forKey:keyName];
 			}
 		}
 		NSLog(@"verifyDictionary: %@", [verifyDictionary description]);
-		
+
 		// Truncate sumfile and re-persist sumsDictionary to file
 		NSFileHandle* store = [NSFileHandle fileHandleForWritingAtPath:persistMD5Store];
 		if (store != nil) {
 			[store truncateFileAtOffset:0];
-			
+
 			// Iterate through sumsDictionary and write data to file
 			NSArray* sumKeys = [sumsDictionary allKeys];
-			
+
 			NSString* key;
 			for(key in sumKeys) {
 				// Prepare data that should be written to file
 				char persist_char[2048]; // 256-byte bucket name, 1024-byte key name, 32-byte sum, 4 delimiters
-				int persist_len = snprintf(persist_char, sizeof(persist_char), "%s:%s\n", 
+				int persist_len = snprintf(persist_char, sizeof(persist_char), "%s:%s\n",
 					[key UTF8String], [[sumsDictionary valueForKey:key] UTF8String]);
-				
+
 				NSData* persist_data = [NSData dataWithBytes:persist_char length:persist_len];
-				
+
 				// Write data to file
 				[store writeData:persist_data];
 			}
@@ -262,7 +262,7 @@
 		}
 		return true;
 	}
-	
+
 	return false;
 }
 
@@ -271,7 +271,7 @@
 	NSMutableString* sumAndPath = [NSMutableString stringWithString:sum];
 	[sumAndPath appendString:@"-"];
 	[sumAndPath appendString:filePath];
-	return [NSString stringWithString:sumAndPath];	
+	return [NSString stringWithString:sumAndPath];
 }
 
 - (void)storeSumForVerification:(NSString*)sum filePath:(NSString*)filePath

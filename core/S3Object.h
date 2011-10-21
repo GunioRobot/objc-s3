@@ -10,11 +10,11 @@
 #import <Cocoa/Cocoa.h>
 
 /* Amazon Doc:
-Objects are the fundamental entities stored in Amazon S3. Objects are composed of object data and 
-metadata. The data portion is opaque to Amazon S3. The metadata is a set of name-value pairs that 
-describe the object. These include some default metadata such as the date last modified, and standard 
-HTTP metadata such as Content-Type. The developer may also specify custom metadata at the time the 
-Object is stored. 
+Objects are the fundamental entities stored in Amazon S3. Objects are composed of object data and
+metadata. The data portion is opaque to Amazon S3. The metadata is a set of name-value pairs that
+describe the object. These include some default metadata such as the date last modified, and standard
+HTTP metadata such as Content-Type. The developer may also specify custom metadata at the time the
+Object is stored.
 */
 
 @class S3Bucket;
@@ -44,14 +44,14 @@ extern NSString *S3ObjectMetadataStorageClassKey;
 	NSDictionary *_dataSourceInfo;
 }
 
-// Initializes an S3Object with the bucket it is contained in, the key that identifies it in that bucket, user 
+// Initializes an S3Object with the bucket it is contained in, the key that identifies it in that bucket, user
 // defined metadata and metadata that is stored along with the object and a data source that provides the data
 // for the object. User defined metadata is transformed internally to a specially formed metadata-key and stored
 // with the metadata-key accepted by Amazon's S3 service.
 - (id)initWithBucket:(S3Bucket *)bucket key:(NSString *)key userDefinedMetadata:(NSDictionary *)udmd metadata:(NSDictionary *)md dataSourceInfo:(NSDictionary *)info;
 
 // Initializes an S3Object with the bucket it is contained in, the key that identifies it in that bucket,
-// user defined metadata and metadata that is stored along with the object. User defined metadata is 
+// user defined metadata and metadata that is stored along with the object. User defined metadata is
 // transformed internally to a specially formed metadata-key and stored with the metadata-key accepted by
 // Amazon's S3 service. If the specially formed metadata also exists in metadata then metadata will win.
 - (id)initWithBucket:(S3Bucket *)bucket key:(NSString *)key userDefinedMetadata:(NSDictionary *)udmd metadata:(NSDictionary *)md;

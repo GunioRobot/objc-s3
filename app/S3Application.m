@@ -27,7 +27,7 @@
 
 + (void)initialize {
     [NSDateFormatter setDefaultFormatterBehavior:NSDateFormatterBehavior10_4];
-    
+
     S3FileSizeTransformer *fileSizeTransformer = [[[S3FileSizeTransformer alloc] init] autorelease];
     [NSValueTransformer setValueTransformer:fileSizeTransformer forName:@"S3FileSizeTransformer"];
 }
@@ -41,7 +41,7 @@
 }
 
 - (IBAction)openConnection:(id)sender
-{    
+{
 	S3LoginController *c = [[[S3LoginController alloc] initWithWindowNibName:@"Authentication"] autorelease];
 //	[c setConnectionInfo:_connectionInfo];
 	[c showWindow:self];
@@ -64,30 +64,30 @@
         [c setConnectionInfo:_connectionInfo];
         [c showWindow:self];
         [c refresh:self];
-        [c retain];			
-    }    
+        [c retain];
+    }
 }
 
 - (void)¿
 {
 	[super finishLaunching];
-    
+
     _connectionInfo = [[[S3ConnectionInfo alloc] init] autorelease];
     [_connectionInfo setDelegate:[NSApp delegate]];
-    
+
 	S3OperationController *c = [[[S3OperationController alloc] initWithWindowNibName:@"Operations"] autorelease];
 	[_controlers setObject:c forKey:@"Console"];
-    
+
     NSUserDefaults *standardUserDefaults = [NSUserDefaults standardUserDefaults];
     NSNumber *consoleVisible = [standardUserDefaults objectForKey:@"consolevisible"];
-    // cover the migration cases 
+    // cover the migration cases
     if (([consoleVisible boolValue] == TRUE)||(consoleVisible==nil)) {
-        [[_controlers objectForKey:@"Console"] showWindow:self];        
+        [[_controlers objectForKey:@"Console"] showWindow:self];
     } else {
         // Load the window to be ready for the console to be shown.
         [[_controlers objectForKey:@"Console"] window];
     }
-    
+
     if ([[standardUserDefaults objectForKey:@"autologin"] boolValue] == TRUE) {
         [self tryAutoLogin];
     }
@@ -109,7 +109,7 @@
 {
     NSString *defaultKey = nil;
     if (connectionInfo == _connectionInfo) {
-        defaultKey = [[NSUserDefaults standardUserDefaults] stringForKey:DEFAULT_USER];        
+        defaultKey = [[NSUserDefaults standardUserDefaults] stringForKey:DEFAULT_USER];
     }
     return defaultKey;
 }
@@ -124,10 +124,10 @@
 
     void *passwordData = nil; // will be allocated and filled in by SecKeychainFindGenericPassword
 	UInt32 passwordLength = 0;
-    
+
 	NSString *secretAccessKey = nil;
-	const char *user = [accessKey UTF8String]; 
-    
+	const char *user = [accessKey UTF8String];
+
 	OSStatus status;
 	status = SecKeychainFindGenericPassword (NULL, // default keychain
                                              strlen(S3_BROWSER_KEYCHAIN_SERVICE), S3_BROWSER_KEYCHAIN_SERVICE,
@@ -135,10 +135,10 @@
                                              &passwordLength, &passwordData,
                                              nil);
 	if (status == noErr) {
-		secretAccessKey = [[[NSString alloc] initWithBytes:passwordData length:passwordLength encoding:NSUTF8StringEncoding] autorelease];        
+		secretAccessKey = [[[NSString alloc] initWithBytes:passwordData length:passwordLength encoding:NSUTF8StringEncoding] autorelease];
     }
-	SecKeychainItemFreeContent(NULL, passwordData);	
-	
+	SecKeychainItemFreeContent(NULL, passwordData);
+
 	return secretAccessKey;
 }
 

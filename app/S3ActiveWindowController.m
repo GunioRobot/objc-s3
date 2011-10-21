@@ -33,20 +33,20 @@
     if (index == NSNotFound) {
         return;
     }
-        
+
     if ([operation state] == S3OperationCanceled || [operation state] == S3OperationRequiresRedirect || [operation state] == S3OperationDone) {
         [_operations removeObjectAtIndex:index];
         [[[NSApp delegate] operationLog] unlogOperation:operation];
     }
-    
-    if ([operation state] == S3OperationRequiresRedirect) {        
+
+    if ([operation state] == S3OperationRequiresRedirect) {
         NSData *operationResponseData = [operation responseData];
         NSError *error = nil;
         NSXMLDocument *d = [[[NSXMLDocument alloc] initWithData:operationResponseData options:NSXMLDocumentTidyXML error:&error] autorelease];
         if (error) {
             return;
         }
-        
+
         NSArray *buckets = [[d rootElement] nodesForXPath:@"//Bucket" error:&error];
         if (error) {
             return;
@@ -56,13 +56,13 @@
             bucketName = [[buckets objectAtIndex:0] stringValue];
             bucketName = [NSString stringWithFormat:@"%@.", bucketName];
         }
-        
+
         NSArray *endpoints = [[d rootElement] nodesForXPath:@"//Endpoint" error:&error];
         NSString *endpoint = nil;
         if ([endpoints count] == 1) {
             endpoint = [[endpoints objectAtIndex:0] stringValue];
         }
-        
+
         if (bucketName && endpoint) {
             NSRange bucketNameInEndpointRange = [endpoint rangeOfString:bucketName];
             if (NSEqualRanges(bucketNameInEndpointRange, NSMakeRange(NSNotFound, 0))) {
@@ -74,18 +74,18 @@
             S3MutableConnectionInfo *redirectConnectionInfo = [operationConnectionInfo mutableCopy];
             [redirectConnectionInfo setHostEndpoint:pureEndpoint];
             [redirectConnectionInfo setDelegate:self];
-            
+
             [_redirectConnectionInfoMappings setObject:operationConnectionInfo forKey:redirectConnectionInfo];
-            
+
             S3Operation *replacementOperation = [[[operation class] alloc] initWithConnectionInfo:redirectConnectionInfo operationInfo:operationInfo];
             [redirectConnectionInfo release];
             [operationInfo release];
-            
+
             [self addToCurrentOperations:replacementOperation];
             [replacementOperation release];
-        }        
+        }
     }
-    
+
     if ([_redirectConnectionInfoMappings objectForKey:[operation connectionInfo]]) {
         int activeConnectionInfos = 0;
         for (S3Operation *currentOperation in _operations) {
@@ -94,9 +94,9 @@
             }
         }
         if (activeConnectionInfos == 1) {
-            [_redirectConnectionInfoMappings removeObjectForKey:[operation connectionInfo]];            
+            [_redirectConnectionInfoMappings removeObjectForKey:[operation connectionInfo]];
         }
-    }    
+    }
 }
 
 #pragma mark -
@@ -116,7 +116,7 @@
 
 - (S3ConnectionInfo *)connectionInfo
 {
-    return _connectionInfo; 
+    return _connectionInfo;
 }
 
 - (void)setConnectionInfo:(S3ConnectionInfo *)aConnectionInfo

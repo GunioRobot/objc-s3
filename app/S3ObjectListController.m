@@ -66,9 +66,9 @@
 
     _renameOperations = [[NSMutableArray alloc] init];
     _redirectConnectionInfoMappings = [[NSMutableDictionary alloc] init];
-    
+
     [_objectsController setFileOperationsDelegate:self];
-    
+
     [[[NSApp delegate] queue] addQueueListener:self];
 }
 
@@ -85,9 +85,9 @@
     if ([[theItem itemIdentifier] isEqualToString: @"Remove All"]) {
         return [[_objectsController arrangedObjects] count] > 0;
     } else if ([[theItem itemIdentifier] isEqualToString: @"Remove"]) {
-        return [_objectsController canRemove];        
+        return [_objectsController canRemove];
     } else if ([[theItem itemIdentifier] isEqualToString: @"Download"]) {
-        return [_objectsController canRemove];        
+        return [_objectsController canRemove];
     } else if ([[theItem itemIdentifier] isEqualToString: @"Rename"]) {
         return ([[_objectsController selectedObjects] count] == 1 );
     }
@@ -96,13 +96,13 @@
 
 - (NSArray *)toolbarDefaultItemIdentifiers:(NSToolbar *)toolbar
 {
-    return [NSArray arrayWithObjects: @"Upload", @"Download", @"Rename", @"Remove", NSToolbarSeparatorItemIdentifier,  @"Remove All", NSToolbarFlexibleSpaceItemIdentifier, @"Refresh", nil]; 
+    return [NSArray arrayWithObjects: @"Upload", @"Download", @"Rename", @"Remove", NSToolbarSeparatorItemIdentifier,  @"Remove All", NSToolbarFlexibleSpaceItemIdentifier, @"Refresh", nil];
 }
 
 - (NSToolbarItem *)toolbar:(NSToolbar *)toolbar itemForItemIdentifier:(NSString *)itemIdentifier willBeInsertedIntoToolbar:(BOOL) flag
 {
     NSToolbarItem *item = [[NSToolbarItem alloc] initWithItemIdentifier: itemIdentifier];
-    
+
     if ([itemIdentifier isEqualToString: @"Upload"])
     {
         [item setLabel: NSLocalizedString(@"Upload", nil)];
@@ -149,7 +149,7 @@
         [item setTarget:self];
         [item setAction:@selector(rename:)];
     }
-    
+
     return [item autorelease];
 }
 
@@ -180,21 +180,21 @@
     if (index == NSNotFound) {
         return;
     }
-    
+
     [super operationQueueOperationStateDidChange:notification];
-        
+
     if ([op isKindOfClass:[S3ListObjectOperation class]] && [op state] == S3OperationDone) {
         [self addObjects:[(S3ListObjectOperation *)op objects]];
         [self setObjectsInfo:[(S3ListObjectOperation*)op metadata]];
-        
+
         S3ListObjectOperation *next = [(S3ListObjectOperation *)op operationForNextChunk];
         if (next != nil) {
-            [self addToCurrentOperations:next];            
+            [self addToCurrentOperations:next];
         } else {
             [self setValidList:YES];
         }
     }
-    
+
     if ([op isKindOfClass:[S3CopyObjectOperation class]] && [_renameOperations containsObject:op] && [op state] == S3OperationDone) {
         [self setValidList:NO];
         S3Object *sourceObject = [[op operationInfo] objectForKey:@"sourceObject"];
@@ -203,7 +203,7 @@
         [self addToCurrentOperations:deleteOp];
         [deleteOp release];
     }
-    
+
     if (([op isKindOfClass:[S3AddObjectOperation class]] || [op isKindOfClass:[S3DeleteObjectOperation class]]) && [op state] == S3OperationDone) {
         [self setValidList:NO];
         NSUserDefaults *standardUserDefaults = [NSUserDefaults standardUserDefaults];
@@ -212,7 +212,7 @@
         }
         // Simple heuristics: if we still have something in the operation queue, no need to refresh now
         if (![self hasActiveOperations]) {
-            [self refresh:self];            
+            [self refresh:self];
         } else {
             _needsRefresh = YES;
         }
@@ -226,9 +226,9 @@
 //    if (index == NSNotFound) {
 //        return;
 //    }
-//    
+//
 //    [super s3OperationDidFail:notification];
-//    
+//
 //    if (_needsRefresh == YES && [self hasActiveOperations] == NO) {
 //        [self refresh:self];
 //    }
@@ -241,9 +241,9 @@
 {
     [self setObjects:[NSMutableArray array]];
     [self setValidList:NO];
-        
+
     S3ListObjectOperation *op = [[S3ListObjectOperation alloc] initWithConnectionInfo:[self connectionInfo] bucket:[self bucket]];
-    
+
     [self addToCurrentOperations:op];
 }
 
@@ -260,10 +260,10 @@
         return;
     }
     [alert release];
-    
+
     S3Object *b;
     NSEnumerator *e = [[_objectsController arrangedObjects] objectEnumerator];
-        
+
     while (b = [e nextObject])
     {
         S3DeleteObjectOperation *op = [[S3DeleteObjectOperation alloc] initWithConnectionInfo:[self connectionInfo] object:b];
@@ -289,9 +289,9 @@
             [alert release];
             return;
         }
-        [alert release];        
+        [alert release];
     }
-    
+
     NSEnumerator *e = [[_objectsController selectedObjects] objectEnumerator];
     while (b = [e nextObject])
     {
@@ -305,7 +305,7 @@
 {
     S3Object *b;
     NSEnumerator *e = [[_objectsController selectedObjects] objectEnumerator];
-        
+
     while (b = [e nextObject])
     {
         NSSavePanel *sp = [NSSavePanel savePanel];
@@ -328,28 +328,28 @@
     NSString *key = [data objectForKey:FILEDATA_KEY];
     NSString *mime = [data objectForKey:FILEDATA_TYPE];
     NSNumber *size = [data objectForKey:FILEDATA_SIZE];
-    
+
     if (![self acceptFileForImport:path])
-    {   
+    {
         NSDictionary* d = [NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:NSLocalizedString(@"The file '%@' could not be read",nil),path],NSLocalizedDescriptionKey,nil];
-        [[self window] presentError:[NSError errorWithDomain:S3_ERROR_DOMAIN code:-2 userInfo:d] modalForWindow:[self window] delegate:self 
+        [[self window] presentError:[NSError errorWithDomain:S3_ERROR_DOMAIN code:-2 userInfo:d] modalForWindow:[self window] delegate:self
                  didPresentSelector:@selector(didPresentErrorWithRecovery:contextInfo:) contextInfo:nil];
-        return;        
+        return;
     }
-    
+
     NSMutableDictionary *dataSourceInfo = nil;
     NSString *md5 = nil;
     if ([size longLongValue] < (1024 * 16)) {
         NSData *bodyData = [NSData dataWithContentsOfFile:path];
-        dataSourceInfo = [NSDictionary dictionaryWithObject:bodyData forKey:S3ObjectNSDataSourceKey];        
+        dataSourceInfo = [NSDictionary dictionaryWithObject:bodyData forKey:S3ObjectNSDataSourceKey];
         md5 = [[bodyData md5Digest] encodeBase64];
     } else {
-        dataSourceInfo = [NSDictionary dictionaryWithObject:path forKey:S3ObjectFilePathDataSourceKey];        
+        dataSourceInfo = [NSDictionary dictionaryWithObject:path forKey:S3ObjectFilePathDataSourceKey];
         NSError *error = nil;
         NSData *bodyData = [NSData dataWithContentsOfFile:path options:(NSMappedRead|NSUncachedRead) error:&error];
         md5 = [[bodyData md5Digest] encodeBase64];
     }
-    
+
     NSMutableDictionary *metadataDict = [NSMutableDictionary dictionary];
     if (md5 != nil) {
         [metadataDict setObject:md5 forKey:S3ObjectMetadataContentMD5Key];
@@ -364,7 +364,7 @@
         [metadataDict setObject:size forKey:S3ObjectMetadataContentLengthKey];
     }
     S3Object *objectToAdd = [[S3Object alloc] initWithBucket:[self bucket] key:key userDefinedMetadata:nil metadata:metadataDict dataSourceInfo:dataSourceInfo];
-        
+
     S3AddObjectOperation *op = [[S3AddObjectOperation alloc] initWithConnectionInfo:[self connectionInfo] object:objectToAdd];
     [objectToAdd release];
 
@@ -373,12 +373,12 @@
 }
 
 - (void)uploadFiles
-{	
+{
     NSEnumerator *e = [[self uploadData] objectEnumerator];
     NSDictionary *data;
 
     while (data = [e nextObject]) {
-        [self uploadFile:data acl:[self uploadACL]];        
+        [self uploadFile:data acl:[self uploadACL]];
     }
 }
 
@@ -396,7 +396,7 @@
     [sheet orderOut:self];
     if (returnCode!=SHEET_OK)
         return;
-    
+
     [self uploadFiles];
 }
 
@@ -409,11 +409,11 @@
 {
     // First expand directories and only keep paths to files
     NSArray *paths = [files expandPaths];
-        
+
     NSString *path;
     NSMutableArray *filesInfo = [NSMutableArray array];
-    NSString *prefix = [NSString commonPathComponentInPaths:paths]; 
-    
+    NSString *prefix = [NSString commonPathComponentInPaths:paths];
+
     for (path in paths) {
         NSMutableDictionary *info = [NSMutableDictionary dictionary];
         [info setObject:path forKey:FILEDATA_PATH];
@@ -422,12 +422,12 @@
         [info setObject:[path substringFromIndex:[prefix length]] forKey:FILEDATA_KEY];
         [filesInfo addObject:info];
     }
-    
+
     [self setUploadData:filesInfo];
 
     NSString* defaultPrivacy = [[NSUserDefaults standardUserDefaults] stringForKey:DEFAULT_PRIVACY];
     if (defaultPrivacy==nil) {
-        defaultPrivacy = ACL_PRIVATE;        
+        defaultPrivacy = ACL_PRIVATE;
     }
     [self setUploadACL:defaultPrivacy];
     [self setUploadSize:[NSString readableSizeForPaths:paths]];
@@ -439,12 +439,12 @@
         if ([paths count]==1)
         {
             [self setUploadFilename:[[paths objectAtIndex:0] stringByAbbreviatingWithTildeInPath]];
-            [NSApp beginSheet:uploadSheet modalForWindow:[self window] modalDelegate:self didEndSelector:@selector(didEndSheet:returnCode:contextInfo:) contextInfo:nil];			
+            [NSApp beginSheet:uploadSheet modalForWindow:[self window] modalDelegate:self didEndSelector:@selector(didEndSheet:returnCode:contextInfo:) contextInfo:nil];
         }
         else
         {
             [self setUploadFilename:[NSString stringWithFormat:NSLocalizedString(@"%d elements in %@",nil),[paths count],[prefix stringByAbbreviatingWithTildeInPath]]];
-            [NSApp beginSheet:multipleUploadSheet modalForWindow:[self window] modalDelegate:self didEndSelector:@selector(didEndSheet:returnCode:contextInfo:) contextInfo:nil];							
+            [NSApp beginSheet:multipleUploadSheet modalForWindow:[self window] modalDelegate:self didEndSelector:@selector(didEndSheet:returnCode:contextInfo:) contextInfo:nil];
         }
     }
 }
@@ -453,7 +453,7 @@
 - (void)openPanelDidEnd:(NSOpenPanel *)panel returnCode:(int)returnCode contextInfo:(void *)contextInfo
 {
     NSArray *files = [panel filenames];
-    
+
     if (returnCode != NSOKButton) {
         [panel release];
         return;
@@ -473,18 +473,18 @@
     if (returnCode!=SHEET_OK) {
         return;
     }
-    
+
     if ([[source key] isEqualToString:[self renameName]]) {
         return;
     }
-    
+
     S3Object *newObject = [[S3Object alloc] initWithBucket:[self bucket] key:[self renameName]];
-        
+
     S3CopyObjectOperation *copyOp = [[S3CopyObjectOperation alloc] initWithConnectionInfo:[self connectionInfo] from:source to:newObject];
     [newObject release];
-    
+
     [_renameOperations addObject:copyOp];
-    
+
     [self addToCurrentOperations:copyOp];
 }
 
@@ -511,7 +511,7 @@
 
 - (NSMutableArray *)objects
 {
-    return _objects; 
+    return _objects;
 }
 
 - (void)setObjects:(NSMutableArray *)aObjects
@@ -522,7 +522,7 @@
 
 - (NSMutableDictionary *)objectsInfo
 {
-    return _objectsInfo; 
+    return _objectsInfo;
 }
 
 - (void)setObjectsInfo:(NSMutableDictionary *)aObjectsInfo
@@ -533,7 +533,7 @@
 
 - (S3Bucket *)bucket
 {
-    return _bucket; 
+    return _bucket;
 }
 
 - (void)setBucket:(S3Bucket *)aBucket
@@ -555,7 +555,7 @@
 
 - (NSString *)uploadACL
 {
-    return _uploadACL; 
+    return _uploadACL;
 }
 
 - (void)setUploadACL:(NSString *)anUploadACL
@@ -567,7 +567,7 @@
 
 - (NSString *)uploadFilename
 {
-    return _uploadFilename; 
+    return _uploadFilename;
 }
 
 - (void)setUploadFilename:(NSString *)anUploadFilename
@@ -578,7 +578,7 @@
 
 - (NSString *)uploadSize
 {
-    return _uploadSize; 
+    return _uploadSize;
 }
 
 - (void)setUploadSize:(NSString *)anUploadSize
@@ -589,7 +589,7 @@
 
 - (NSMutableArray *)uploadData
 {
-    return [[_uploadData retain] autorelease]; 
+    return [[_uploadData retain] autorelease];
 }
 
 - (void)setUploadData:(NSMutableArray *)data
@@ -623,10 +623,10 @@
 -(void)dealloc
 {
     [[[NSApp delegate] queue] removeQueueListener:self];
-    
+
     [_renameOperations release];
     [_redirectConnectionInfoMappings release];
-    
+
     [self setObjects:nil];
     [self setObjectsInfo:nil];
     [self setBucket:nil];
@@ -634,7 +634,7 @@
     [self setUploadACL:nil];
     [self setUploadFilename:nil];
     [self setUploadData:nil];
-    
+
     [super dealloc];
 }
 

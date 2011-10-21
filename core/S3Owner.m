@@ -24,12 +24,12 @@
 - (id)initWithID:(NSString *)name displayName:(NSString *)date
 {
 	self = [super init];
-    
+
     if (self != nil) {
         [self setID:name];
-        [self setDisplayName:date];        
+        [self setDisplayName:date];
     }
-    
+
 	return self;
 }
 

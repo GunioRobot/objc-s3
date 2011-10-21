@@ -58,7 +58,7 @@ NSString *AWSRegionEUIrelandValue = @"EU";
             [region setRegionKey:theRegionKey];
             // TODO: a better way to set the available services for each region
             if (![theRegionKey isEqualToString:AWSRegionUSEastKey]) {
-                [region setAvailableServices:AWSSimpleStorageService];                
+                [region setAvailableServices:AWSSimpleStorageService];
             }
             return [region autorelease];
         }
